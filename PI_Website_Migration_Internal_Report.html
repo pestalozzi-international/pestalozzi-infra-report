@@ -1,0 +1,997 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Website Infrastructure — Internal Review | Pestalozzi International</title>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800&family=Playfair+Display:ital,wght@0,700;1,400&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --red: #CA0733;
+    --dark: #343837;
+    --sand: #F1E8DA;
+    --sky: #C6F1F6;
+    --white: #ffffff;
+    --light-gray: #f8f8f6;
+    --mid-gray: #e8e4de;
+    --text-muted: #7a7a7a;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Montserrat', sans-serif;
+    background: var(--light-gray);
+    color: var(--dark);
+    line-height: 1.7;
+  }
+
+  /* COVER */
+  .cover {
+    background: var(--dark);
+    color: white;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: 60px;
+    position: relative;
+    overflow: hidden;
+  }
+  .cover::before {
+    content: '';
+    position: absolute;
+    top: -100px; right: -100px;
+    width: 500px; height: 500px;
+    background: var(--red);
+    border-radius: 50%;
+    opacity: 0.12;
+  }
+  .cover::after {
+    content: '';
+    position: absolute;
+    bottom: -80px; left: -80px;
+    width: 350px; height: 350px;
+    background: var(--sky);
+    border-radius: 50%;
+    opacity: 0.08;
+  }
+  .cover-logo {
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.5);
+  }
+  .cover-logo span { color: var(--red); }
+  .cover-main { position: relative; z-index: 1; }
+  .cover-tag {
+    display: inline-block;
+    background: var(--red);
+    color: white;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    padding: 6px 14px;
+    margin-bottom: 32px;
+  }
+  .cover h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(40px, 6vw, 72px);
+    line-height: 1.1;
+    margin-bottom: 24px;
+    font-weight: 700;
+  }
+  .cover h1 em {
+    color: var(--red);
+    font-style: italic;
+    font-family: 'Playfair Display', serif;
+  }
+  .cover-sub {
+    font-size: 16px;
+    color: rgba(255,255,255,0.6);
+    max-width: 500px;
+    font-weight: 300;
+  }
+  .cover-meta {
+    display: flex;
+    gap: 48px;
+    position: relative;
+    z-index: 1;
+  }
+  .cover-meta-item { font-size: 12px; color: rgba(255,255,255,0.4); }
+  .cover-meta-item strong { display: block; color: white; font-size: 14px; margin-bottom: 2px; }
+
+  /* NAV */
+  .toc {
+    background: var(--sand);
+    padding: 60px;
+  }
+  .toc h2 {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--red);
+    margin-bottom: 32px;
+  }
+  .toc-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 4px;
+  }
+  .toc-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 14px 0;
+    border-top: 1px solid rgba(52,56,55,0.15);
+    cursor: pointer;
+    text-decoration: none;
+    color: var(--dark);
+    transition: all 0.2s;
+  }
+  .toc-item:hover { color: var(--red); }
+  .toc-num {
+    font-size: 10px;
+    font-weight: 700;
+    color: var(--red);
+    opacity: 0.6;
+    min-width: 24px;
+  }
+  .toc-label { font-size: 13px; font-weight: 600; }
+
+  /* SECTIONS */
+  .section {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 80px 60px;
+  }
+  .section-label {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--red);
+    margin-bottom: 12px;
+  }
+  .section h2 {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(28px, 4vw, 42px);
+    font-weight: 700;
+    line-height: 1.2;
+    margin-bottom: 40px;
+    color: var(--dark);
+  }
+  .section h3 {
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--dark);
+    margin-bottom: 12px;
+    margin-top: 32px;
+  }
+  .section p {
+    font-size: 15px;
+    color: #4a4a4a;
+    margin-bottom: 20px;
+    font-weight: 400;
+    max-width: 720px;
+  }
+
+  .divider { height: 1px; background: var(--mid-gray); margin: 0 60px; }
+
+  /* CALLOUT BOXES */
+  .callout {
+    border-left: 4px solid var(--red);
+    background: var(--sand);
+    padding: 20px 24px;
+    margin: 24px 0;
+    max-width: 720px;
+  }
+  .callout.sky { border-color: #4db8c8; background: var(--sky); }
+  .callout.dark { border-color: var(--dark); background: var(--dark); color: white; }
+  .callout.dark p { color: rgba(255,255,255,0.8); }
+  .callout-title { font-size: 11px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 8px; color: var(--red); }
+  .callout.sky .callout-title { color: #2a8a96; }
+  .callout.dark .callout-title { color: var(--sky); }
+  .callout p { font-size: 14px; margin-bottom: 0; }
+
+  /* DIAGRAM: CURRENT STATE */
+  .diagram-wrap {
+    background: var(--dark);
+    border-radius: 4px;
+    padding: 48px;
+    margin: 40px 0;
+    position: relative;
+    overflow: hidden;
+  }
+  .diagram-wrap::before {
+    content: 'CURRENT ARCHITECTURE';
+    position: absolute;
+    top: 20px; right: 24px;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    color: rgba(255,255,255,0.2);
+  }
+  .diagram-title {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.4);
+    margin-bottom: 40px;
+  }
+  .arch-flow {
+    display: flex;
+    align-items: stretch;
+    gap: 0;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+  .arch-node {
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 4px;
+    padding: 20px 18px;
+    text-align: center;
+    min-width: 120px;
+    position: relative;
+  }
+  .arch-node.red { border-color: var(--red); background: rgba(202,7,51,0.15); }
+  .arch-node.sky { border-color: #4db8c8; background: rgba(198,241,246,0.08); }
+  .arch-node.owned { border-color: #4ade80; background: rgba(74,222,128,0.08); }
+  .arch-node-icon { font-size: 24px; margin-bottom: 8px; }
+  .arch-node-name { font-size: 11px; font-weight: 700; color: white; margin-bottom: 4px; }
+  .arch-node-desc { font-size: 10px; color: rgba(255,255,255,0.45); line-height: 1.4; }
+  .arch-node-owner {
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    margin-top: 10px;
+    padding: 3px 8px;
+    border-radius: 2px;
+    display: inline-block;
+  }
+  .owner-lucid { background: rgba(202,7,51,0.3); color: #ff8fa3; }
+  .owner-pi { background: rgba(74,222,128,0.2); color: #4ade80; }
+  .owner-shared { background: rgba(255,200,0,0.2); color: #ffd700; }
+
+  .arch-arrow {
+    display: flex;
+    align-items: center;
+    padding: 0 8px;
+    color: rgba(255,255,255,0.25);
+    font-size: 20px;
+    align-self: center;
+  }
+  .arch-group {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .arch-group-label {
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.3);
+    text-align: center;
+    margin-bottom: 4px;
+  }
+
+  .legend {
+    display: flex;
+    gap: 24px;
+    margin-top: 32px;
+    flex-wrap: wrap;
+  }
+  .legend-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 11px;
+    color: rgba(255,255,255,0.5);
+  }
+  .legend-dot {
+    width: 10px; height: 10px;
+    border-radius: 2px;
+  }
+  .ld-lucid { background: #ff8fa3; }
+  .ld-pi { background: #4ade80; }
+  .ld-shared { background: #ffd700; }
+
+  /* PROBLEM CARDS */
+  .problem-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 16px;
+    margin: 32px 0;
+  }
+  .problem-card {
+    background: white;
+    border: 1px solid var(--mid-gray);
+    padding: 24px;
+    position: relative;
+    overflow: hidden;
+  }
+  .problem-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0;
+    width: 4px; height: 100%;
+    background: var(--red);
+  }
+  .problem-card h4 { font-size: 14px; font-weight: 700; margin-bottom: 8px; padding-left: 12px; }
+  .problem-card p { font-size: 13px; color: #5a5a5a; margin: 0; padding-left: 12px; }
+  .problem-num {
+    position: absolute;
+    top: 20px; right: 20px;
+    font-size: 32px;
+    font-weight: 800;
+    color: rgba(202,7,51,0.08);
+    line-height: 1;
+  }
+
+  /* MIGRATION TIMELINE */
+  .timeline {
+    position: relative;
+    padding-left: 40px;
+    margin: 40px 0;
+  }
+  .timeline::before {
+    content: '';
+    position: absolute;
+    left: 12px; top: 0; bottom: 0;
+    width: 2px;
+    background: var(--mid-gray);
+  }
+  .timeline-item {
+    position: relative;
+    margin-bottom: 40px;
+  }
+  .timeline-dot {
+    position: absolute;
+    left: -34px; top: 4px;
+    width: 14px; height: 14px;
+    border-radius: 50%;
+    background: var(--red);
+    border: 3px solid var(--light-gray);
+    z-index: 1;
+  }
+  .timeline-dot.green { background: #4ade80; }
+  .timeline-dot.sky { background: #4db8c8; }
+  .timeline-phase {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--red);
+    margin-bottom: 6px;
+  }
+  .timeline-phase.green { color: #2a8a50; }
+  .timeline-phase.sky { color: #2a8a96; }
+  .timeline-title { font-size: 17px; font-weight: 700; margin-bottom: 8px; }
+  .timeline-body { font-size: 14px; color: #5a5a5a; max-width: 600px; }
+  .timeline-tag {
+    display: inline-block;
+    font-size: 10px;
+    font-weight: 600;
+    padding: 3px 10px;
+    border-radius: 2px;
+    margin-top: 10px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+  }
+  .tag-you { background: rgba(74,222,128,0.15); color: #2a8a50; }
+  .tag-dev { background: rgba(202,7,51,0.1); color: var(--red); }
+  .tag-shared { background: rgba(255,200,0,0.15); color: #a07000; }
+
+  /* COST TABLE */
+  .cost-section { background: var(--dark); padding: 80px 60px; }
+  .cost-section .section-label { color: var(--sky); }
+  .cost-section h2 { color: white; }
+  .cost-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+    margin-top: 40px;
+  }
+  @media (max-width: 700px) { .cost-grid { grid-template-columns: 1fr; } }
+  .cost-col-title {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.4);
+    margin-bottom: 16px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+  }
+  .cost-col-title.after { color: #4ade80; }
+  .cost-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 0;
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+    font-size: 13px;
+  }
+  .cost-row-label { color: rgba(255,255,255,0.7); }
+  .cost-row-val { font-weight: 700; color: white; }
+  .cost-row-val.free { color: #4ade80; }
+  .cost-row-val.red { color: #ff8fa3; }
+  .cost-total {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px 0;
+    margin-top: 8px;
+    font-size: 16px;
+    font-weight: 800;
+    border-top: 2px solid rgba(255,255,255,0.2);
+  }
+  .cost-total-label { color: white; }
+  .cost-total-val { color: #ffd700; }
+  .cost-total-val.green { color: #4ade80; }
+
+  .savings-banner {
+    background: var(--red);
+    padding: 40px 60px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: gap;
+    gap: 20px;
+  }
+  .savings-text { color: white; }
+  .savings-text h3 { font-size: 13px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; opacity: 0.7; margin-bottom: 8px; }
+  .savings-text p { font-size: 28px; font-weight: 800; }
+  .savings-note { color: rgba(255,255,255,0.7); font-size: 13px; max-width: 400px; line-height: 1.6; }
+
+  /* NEW ARCH DIAGRAM */
+  .new-arch-diagram {
+    background: var(--dark);
+    border-radius: 4px;
+    padding: 48px;
+    margin: 40px 0;
+    position: relative;
+    overflow: hidden;
+  }
+  .new-arch-diagram::before {
+    content: 'PROPOSED ARCHITECTURE';
+    position: absolute;
+    top: 20px; right: 24px;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    color: rgba(255,255,255,0.2);
+  }
+
+  .arch-stack {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+    margin-top: 20px;
+  }
+  .arch-stack-col {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+  .arch-stack-header {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.35);
+    text-align: center;
+    padding-bottom: 12px;
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+    margin-bottom: 4px;
+  }
+  .arch-mini-node {
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 4px;
+    padding: 14px;
+    text-align: center;
+  }
+  .arch-mini-node.green-border { border-color: rgba(74,222,128,0.4); background: rgba(74,222,128,0.06); }
+  .arch-mini-node.sky-border { border-color: rgba(77,184,200,0.4); background: rgba(77,184,200,0.06); }
+  .arch-mini-node-name { font-size: 12px; font-weight: 700; color: white; }
+  .arch-mini-node-desc { font-size: 10px; color: rgba(255,255,255,0.4); margin-top: 4px; }
+  .arch-mini-node-cost { font-size: 11px; font-weight: 700; color: #4ade80; margin-top: 8px; }
+
+  /* EFFECTS */
+  .effects-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 16px;
+    margin: 32px 0;
+  }
+  .effect-card {
+    background: white;
+    border: 1px solid var(--mid-gray);
+    padding: 28px;
+  }
+  .effect-icon { font-size: 28px; margin-bottom: 14px; }
+  .effect-title { font-size: 14px; font-weight: 700; margin-bottom: 8px; }
+  .effect-body { font-size: 13px; color: #5a5a5a; line-height: 1.6; }
+
+  /* FOOTER */
+  .report-footer {
+    background: var(--dark);
+    padding: 40px 60px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 16px;
+  }
+  .report-footer-brand { font-size: 13px; font-weight: 700; color: white; }
+  .report-footer-brand span { color: var(--red); }
+  .report-footer-note { font-size: 11px; color: rgba(255,255,255,0.3); }
+
+  /* PRINT */
+  @media print {
+    .cover { min-height: auto; page-break-after: always; }
+    .section { page-break-inside: avoid; }
+  }
+
+  /* SECTION BG ALTERNATING */
+  .bg-white { background: var(--white); }
+  .bg-sand { background: var(--sand); }
+  .bg-light { background: var(--light-gray); }
+
+  .full-section { padding: 80px 60px; }
+  .full-section .inner { max-width: 1100px; margin: 0 auto; }
+
+  .badge {
+    display: inline-block;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    padding: 4px 12px;
+    border-radius: 2px;
+  }
+  .badge-red { background: rgba(202,7,51,0.1); color: var(--red); }
+  .badge-green { background: rgba(74,222,128,0.15); color: #2a8a50; }
+</style>
+</head>
+<body>
+
+<!-- COVER -->
+<div class="cover">
+  <div class="cover-logo">Pest<span>a</span>lozzi International — Internal Document</div>
+  <div class="cover-main">
+    <div class="cover-tag">Confidential — Internal Use Only</div>
+    <h1>Our Website:<br><em>Where We Are,</em><br>Where We're Going</h1>
+    <p class="cover-sub">A plain-language review of our current web infrastructure, the problems it creates, and a clear plan to take full control — saving money and removing dependency.</p>
+  </div>
+  <div class="cover-meta">
+    <div class="cover-meta-item"><strong>Prepared for</strong>COO & Senior Team</div>
+    <div class="cover-meta-item"><strong>Prepared by</strong>Thomas Lifuti, IT</div>
+    <div class="cover-meta-item"><strong>Date</strong>May 2026</div>
+    <div class="cover-meta-item"><strong>Version</strong>1.0 — Internal</div>
+  </div>
+</div>
+
+<!-- TOC -->
+<div class="toc">
+  <h2>Contents</h2>
+  <div class="toc-grid">
+    <a href="#situation" class="toc-item"><span class="toc-num">01</span><span class="toc-label">The Current Situation</span></a>
+    <a href="#problems" class="toc-item"><span class="toc-num">02</span><span class="toc-label">The Problems We Face</span></a>
+    <a href="#proposed" class="toc-item"><span class="toc-num">03</span><span class="toc-label">The Proposed Solution</span></a>
+    <a href="#migration" class="toc-item"><span class="toc-num">04</span><span class="toc-label">Migration Plan</span></a>
+    <a href="#after" class="toc-item"><span class="toc-num">05</span><span class="toc-label">Life After Migration</span></a>
+    <a href="#costs" class="toc-item"><span class="toc-num">06</span><span class="toc-label">Full Cost Analysis</span></a>
+  </div>
+</div>
+
+<!-- 01 CURRENT SITUATION -->
+<div id="situation" class="full-section bg-white">
+<div class="inner">
+  <div class="section-label">01 — Current Situation</div>
+  <h2>How Our Website Works Today</h2>
+  <p>Our website <strong>pestalozzi.international</strong> is made up of two connected parts: what visitors see (the "frontend") and the system our team uses to write and publish content (the "backend" or CMS). These two parts are currently managed separately — and almost entirely by our external agency, Lucid.</p>
+  <p>Here is a simplified map of all the pieces involved, who controls them, and what they do:</p>
+
+  <div class="diagram-wrap">
+    <div class="diagram-title">How the website works — today</div>
+    <div class="arch-flow">
+      <div class="arch-group">
+        <div class="arch-group-label">Your team edits content</div>
+        <div class="arch-node sky">
+          <div class="arch-node-icon">✍️</div>
+          <div class="arch-node-name">Craft CMS</div>
+          <div class="arch-node-desc">The editing interface our team uses to write news, update pages, etc.</div>
+          <div class="arch-node-owner owner-shared">Shared</div>
+        </div>
+      </div>
+      <div class="arch-arrow">→</div>
+      <div class="arch-group">
+        <div class="arch-group-label">Content is stored here</div>
+        <div class="arch-node">
+          <div class="arch-node-icon">🗄️</div>
+          <div class="arch-node-name">Hostinger Server</div>
+          <div class="arch-node-desc">Stores all content, images, and documents. Rented hosting server.</div>
+          <div class="arch-node-owner owner-lucid">Lucid controls</div>
+        </div>
+      </div>
+      <div class="arch-arrow">→</div>
+      <div class="arch-group">
+        <div class="arch-group-label">Code is managed here</div>
+        <div class="arch-node red">
+          <div class="arch-node-icon">💻</div>
+          <div class="arch-node-name">GitHub</div>
+          <div class="arch-node-desc">The "source code" of the website. All changes go through here.</div>
+          <div class="arch-node-owner owner-lucid">Lucid controls</div>
+        </div>
+      </div>
+      <div class="arch-arrow">→</div>
+      <div class="arch-group">
+        <div class="arch-group-label">Auto-publishes changes</div>
+        <div class="arch-node">
+          <div class="arch-node-icon">⚙️</div>
+          <div class="arch-node-name">Buddy</div>
+          <div class="arch-node-desc">Automatically pushes website updates live when code changes.</div>
+          <div class="arch-node-owner owner-lucid">Lucid pays</div>
+        </div>
+      </div>
+      <div class="arch-arrow">→</div>
+      <div class="arch-group">
+        <div class="arch-group-label">Visitors see this</div>
+        <div class="arch-node sky">
+          <div class="arch-node-icon">🌐</div>
+          <div class="arch-node-name">Netlify</div>
+          <div class="arch-node-desc">Delivers the website to visitors worldwide. We pay Lucid for this.</div>
+          <div class="arch-node-owner owner-lucid">Lucid account</div>
+        </div>
+      </div>
+    </div>
+    <div class="legend">
+      <div class="legend-item"><div class="legend-dot ld-lucid"></div>Controlled / paid by Lucid (billed to us)</div>
+      <div class="legend-item"><div class="legend-dot ld-pi"></div>Controlled by Pestalozzi International</div>
+      <div class="legend-item"><div class="legend-dot ld-shared"></div>Shared access</div>
+    </div>
+  </div>
+
+  <div class="callout">
+    <div class="callout-title">The Key Point</div>
+    <p>Almost every part of our website infrastructure is owned, controlled, or managed by Lucid. We are a tenant in their system — not an owner of ours. This has significant practical and financial consequences.</p>
+  </div>
+
+  <h3>What we currently own outright</h3>
+  <p>The domain name <strong>pestalozzi.international</strong>, our DNS settings (managed via Cloudflare), our Plausible analytics account, and our Hostinger server panel access. Everything else sits inside Lucid's accounts and infrastructure.</p>
+</div>
+</div>
+
+<div class="divider"></div>
+
+<!-- 02 PROBLEMS -->
+<div id="problems" class="full-section bg-light">
+<div class="inner">
+  <div class="section-label">02 — The Problems</div>
+  <h2>Why the Current Setup<br>Doesn't Work For Us</h2>
+  <p>The arrangement made sense when Lucid built the website. But as an ongoing operational reality, it creates a set of problems that affect our team every day and cost us money we shouldn't be spending.</p>
+
+  <div class="problem-grid">
+    <div class="problem-card">
+      <div class="problem-num">1</div>
+      <h4>We pay to make simple changes</h4>
+      <p>Adding a Google Analytics tag, updating a script, or changing a tracking pixel requires a Lucid developer at CHF 190/hour. These are 5-minute tasks that we cannot do ourselves because we don't have access to the code.</p>
+    </div>
+    <div class="problem-card">
+      <div class="problem-num">2</div>
+      <h4>We don't own our own code</h4>
+      <p>The source code of our website lives in Lucid's GitHub account. If our relationship with Lucid ends abruptly, accessing or continuing the website becomes complicated.</p>
+    </div>
+    <div class="problem-card">
+      <div class="problem-num">3</div>
+      <h4>We have unused Azure credits going to waste</h4>
+      <p>As an NPO, Microsoft grants us $2,000 in Azure cloud credits per year. We are currently not using any of them, while paying Hostinger (~CHF 150/year) for the same type of service.</p>
+    </div>
+    <div class="problem-card">
+      <div class="problem-num">4</div>
+      <h4>Bot traffic is costing us money</h4>
+      <p>Our analytics show that ~49% of website "visitors" are actually automated bots, primarily from China. This inflated traffic has pushed us beyond the standard limits on Netlify, creating potential for unexpected extra charges.</p>
+    </div>
+    <div class="problem-card">
+      <div class="problem-num">5</div>
+      <h4>We pay annual software licenses we could avoid</h4>
+      <p>We pay CHF 172/year for Craft CMS and plugins, and CHF 46.47/year for font licenses. Free, equally capable alternatives exist for both.</p>
+    </div>
+    <div class="problem-card">
+      <div class="problem-num">6</div>
+      <h4>No signed agreement for key services</h4>
+      <p>The Frontend Hosting Agreement (the contract for our Netlify hosting) was drafted in February 2025 but has never been signed. The contact person on Pestalozzi's side is listed as "TBA." We are paying for a service with no formal contract in place.</p>
+    </div>
+  </div>
+</div>
+</div>
+
+<div class="divider"></div>
+
+<!-- 03 PROPOSED -->
+<div id="proposed" class="full-section bg-white">
+<div class="inner">
+  <div class="section-label">03 — The Proposed Solution</div>
+  <h2>Taking Ownership of<br>Our Own Infrastructure</h2>
+  <p>The proposal is straightforward: move our entire website infrastructure onto <strong>Microsoft Azure</strong> — cloud services that Pestalozzi International already has $2,000/year in free credits to use, as an NPO. This means we host everything ourselves, own everything ourselves, and stop paying intermediaries.</p>
+
+  <div class="callout sky">
+    <div class="callout-title">What Azure Is</div>
+    <p>Microsoft Azure is the same cloud platform used by thousands of NGOs, universities, and corporations worldwide. As a registered non-profit, we receive $2,000 in free credits every year through Microsoft's NPO programme — more than enough to run our entire website at zero cost.</p>
+  </div>
+
+  <div class="new-arch-diagram">
+    <div class="diagram-title">How the website will work — after migration</div>
+    <div class="arch-stack">
+      <div class="arch-stack-col">
+        <div class="arch-stack-header">🌐 What Visitors See</div>
+        <div class="arch-mini-node green-border">
+          <div class="arch-mini-node-name">Azure Static Web Apps</div>
+          <div class="arch-mini-node-desc">Delivers the website globally. Replaces Netlify. Owned by PI.</div>
+          <div class="arch-mini-node-cost">$0 / month (free tier)</div>
+        </div>
+        <div class="arch-mini-node green-border">
+          <div class="arch-mini-node-name">Cloudflare (DNS)</div>
+          <div class="arch-mini-node-desc">Our domain routing. Already ours, already free.</div>
+          <div class="arch-mini-node-cost">$0 / month</div>
+        </div>
+      </div>
+      <div class="arch-stack-col">
+        <div class="arch-stack-header">⚙️ The Engine (CMS & Data)</div>
+        <div class="arch-mini-node green-border">
+          <div class="arch-mini-node-name">CMS (Open Source)</div>
+          <div class="arch-mini-node-desc">Content editing for our team. Replaces Craft CMS. Free forever.</div>
+          <div class="arch-mini-node-cost">$0 / year (no license)</div>
+        </div>
+        <div class="arch-mini-node sky-border">
+          <div class="arch-mini-node-name">Azure App Service</div>
+          <div class="arch-mini-node-desc">The server running the CMS. Replaces Hostinger.</div>
+          <div class="arch-mini-node-cost">~$18/mo (covered by credits)</div>
+        </div>
+        <div class="arch-mini-node sky-border">
+          <div class="arch-mini-node-name">Azure MySQL Database</div>
+          <div class="arch-mini-node-desc">Stores all our content. Automatic backups included.</div>
+          <div class="arch-mini-node-cost">~$25/mo (covered by credits)</div>
+        </div>
+      </div>
+      <div class="arch-stack-col">
+        <div class="arch-stack-header">📁 Files & Automation</div>
+        <div class="arch-mini-node green-border">
+          <div class="arch-mini-node-name">GitHub (PI Account)</div>
+          <div class="arch-mini-node-desc">Our website code, owned by us. Free via NPO programme.</div>
+          <div class="arch-mini-node-cost">$0 (NPO)</div>
+        </div>
+        <div class="arch-mini-node green-border">
+          <div class="arch-mini-node-name">GitHub Actions</div>
+          <div class="arch-mini-node-desc">Auto-publishes updates. Replaces Buddy. Built into GitHub.</div>
+          <div class="arch-mini-node-cost">$0 / month</div>
+        </div>
+        <div class="arch-mini-node sky-border">
+          <div class="arch-mini-node-name">Azure Blob Storage</div>
+          <div class="arch-mini-node-desc">Stores uploaded images and documents.</div>
+          <div class="arch-mini-node-cost">~$2/mo (covered by credits)</div>
+        </div>
+      </div>
+    </div>
+    <div class="legend" style="margin-top:24px;">
+      <div class="legend-item"><div class="legend-dot ld-pi"></div>Owned and controlled by Pestalozzi International</div>
+      <div class="legend-item"><div class="legend-dot" style="background:#4db8c8;"></div>Hosted on Azure (covered by NPO credits)</div>
+    </div>
+  </div>
+
+  <h3>What changes for our content team?</h3>
+  <p>Very little day-to-day. The CMS editing interface will look and feel similar. Content editors will still log in to a web-based interface to write news articles, update programme pages, and upload media. The key difference is that the system will be ours — no license fees, no dependency on any agency.</p>
+
+  <h3>What changes for IT?</h3>
+  <p>Everything positive. Any technical change — adding Google Analytics, updating scripts, changing fonts, adding a page template — can be done directly by Thomas without involving or paying an external developer. We will have full SSH and admin access to every layer of the system.</p>
+</div>
+</div>
+
+<div class="divider"></div>
+
+<!-- 04 MIGRATION PLAN -->
+<div id="migration" class="full-section bg-sand">
+<div class="inner">
+  <div class="section-label">04 — Migration Plan</div>
+  <h2>How We Get From Here<br>to There</h2>
+  <p>The migration is structured in six phases. Thomas will handle the majority of the work directly — reducing the hours we need to pay for. The only external developer time required is for specialised technical configuration (approximately 4–7 hours).</p>
+
+  <div class="callout">
+    <div class="callout-title">Important First Step — Before Anything Else</div>
+    <p>We must formally request our assets from Lucid in writing: the website source code (GitHub access), the server configuration file (.env), all software license keys, and the deployment pipeline setup. This is our data and they are obligated to provide it. This request should come from leadership, not IT, to set the right tone.</p>
+  </div>
+
+  <div class="timeline">
+    <div class="timeline-item">
+      <div class="timeline-dot"></div>
+      <div class="timeline-phase">Phase 0 — Week 1</div>
+      <div class="timeline-title">Formal Asset Request to Lucid</div>
+      <div class="timeline-body">Send a professional written request for all code, credentials, and license keys. Simultaneously, Thomas creates the Azure resource group and begins provisioning the three services (App Service, MySQL, Blob Storage).</div>
+      <span class="timeline-tag tag-you">Thomas handles</span>
+      <span class="timeline-tag tag-shared">Leadership signs off</span>
+    </div>
+
+    <div class="timeline-item">
+      <div class="timeline-dot sky"></div>
+      <div class="timeline-phase sky">Phase 1 — Week 2</div>
+      <div class="timeline-title">Set Up Azure Infrastructure</div>
+      <div class="timeline-body">Thomas creates all Azure services through the Azure portal — a guided process requiring no advanced technical knowledge. This is our "new home" being prepared before anything moves.</div>
+      <span class="timeline-tag tag-you">Thomas handles</span>
+    </div>
+
+    <div class="timeline-item">
+      <div class="timeline-dot sky"></div>
+      <div class="timeline-phase sky">Phase 2 — Week 2–3</div>
+      <div class="timeline-title">Move the Data</div>
+      <div class="timeline-body">Thomas exports the database from Hostinger (a few clicks in the admin panel) and downloads all website files. These are then uploaded to Azure. This is the "moving boxes" phase — no specialist needed.</div>
+      <span class="timeline-tag tag-you">Thomas handles</span>
+    </div>
+
+    <div class="timeline-item">
+      <div class="timeline-dot red"></div>
+      <div class="timeline-phase">Phase 3 — Week 3</div>
+      <div class="timeline-title">Technical Configuration</div>
+      <div class="timeline-body">A freelance developer (4–7 hours, CHF 80–120/hour) configures the CMS to talk to the new Azure database, sets up file storage, and creates the automated deployment pipeline from GitHub. Thomas participates throughout to learn the system.</div>
+      <span class="timeline-tag tag-dev">4–7h developer time</span>
+      <span class="timeline-tag tag-you">Thomas co-pilots</span>
+    </div>
+
+    <div class="timeline-item">
+      <div class="timeline-dot sky"></div>
+      <div class="timeline-phase sky">Phase 4 — Week 3–4</div>
+      <div class="timeline-title">Test Everything Thoroughly</div>
+      <div class="timeline-body">The new site runs in parallel with the old one. Content team members test the CMS interface. We verify that all pages load correctly, forms work, documents download, and all languages display properly. No visitors are affected — they still see the old site.</div>
+      <span class="timeline-tag tag-shared">Thomas + content team</span>
+    </div>
+
+    <div class="timeline-item">
+      <div class="timeline-dot green"></div>
+      <div class="timeline-phase green">Phase 5 — Week 4</div>
+      <div class="timeline-title">Go Live</div>
+      <div class="timeline-body">Thomas updates two DNS records in Cloudflare — a process taking under 5 minutes. Traffic switches to the new Azure infrastructure. The old Hostinger server remains on standby for 48 hours as a safety net, then is cancelled. We are free.</div>
+      <span class="timeline-tag tag-you">Thomas handles</span>
+    </div>
+  </div>
+
+  <div class="callout sky">
+    <div class="callout-title">Zero Downtime</div>
+    <p>The old website remains fully live throughout the entire migration. Visitors will not experience any interruption. The switchover itself takes seconds via a DNS update.</p>
+  </div>
+</div>
+</div>
+
+<div class="divider"></div>
+
+<!-- 05 AFTER -->
+<div id="after" class="full-section bg-white">
+<div class="inner">
+  <div class="section-label">05 — Life After Migration</div>
+  <h2>What Changes for<br>Pestalozzi International</h2>
+
+  <div class="effects-grid">
+    <div class="effect-card">
+      <div class="effect-icon">🔑</div>
+      <div class="effect-title">Full Ownership</div>
+      <div class="effect-body">Every piece of our website — code, content, data, and infrastructure — is owned and controlled by Pestalozzi International. No agency holds keys to our house.</div>
+    </div>
+    <div class="effect-card">
+      <div class="effect-icon">⚡</div>
+      <div class="effect-title">Instant Changes</div>
+      <div class="effect-body">Adding Google Analytics, updating a tracking pixel, changing fonts, adding a script — Thomas does this in minutes with no external invoice. We stop paying CHF 190/hour for 5-minute tasks.</div>
+    </div>
+    <div class="effect-card">
+      <div class="effect-icon">🛡️</div>
+      <div class="effect-title">Bot Protection</div>
+      <div class="effect-body">Activating Cloudflare's free proxy (we're already on Cloudflare) will block the bot traffic that currently represents ~49% of our "visitors" and was threatening extra charges on Netlify.</div>
+    </div>
+    <div class="effect-card">
+      <div class="effect-icon">💰</div>
+      <div class="effect-title">Significant Savings</div>
+      <div class="effect-body">Annual software costs drop dramatically. Our $2,000 Azure credits cover all hosting. The only remaining annual cost is the Craft CMS license — which can also be eliminated by switching to a free CMS.</div>
+    </div>
+    <div class="effect-card">
+      <div class="effect-icon">📊</div>
+      <div class="effect-title">Real Analytics</div>
+      <div class="effect-body">With Google Analytics installed (free, 5 minutes) alongside Plausible, we get comprehensive data on our real audience — approximately 1,960 genuine human visitors per month, globally distributed across our programme countries.</div>
+    </div>
+    <div class="effect-card">
+      <div class="effect-icon">🔒</div>
+      <div class="effect-title">GDPR Compliance</div>
+      <div class="effect-body">Self-hosting fonts eliminates third-party font requests. Choosing Sweden Central on Azure keeps all data within the EU. Cloudflare's proxy adds an additional layer of data protection.</div>
+    </div>
+  </div>
+
+  <h3>What about the content team's day-to-day?</h3>
+  <p>The content editing experience will be preserved. Editors will still log in to a web-based CMS to write and publish content. If we choose to migrate from Craft CMS to a free alternative (Directus, Payload, or Decap CMS), we will conduct a structured training session before the switch. The visual interface is comparable and in some cases more user-friendly than Craft.</p>
+
+  <h3>What is the risk?</h3>
+  <p>The main risk is timing — specifically, Lucid's speed in providing our assets. We have mitigated this by structuring the migration so that Thomas can proceed with Azure setup in parallel. The technical configuration phase (4–7 hours of developer time) is the only hard dependency. We recommend engaging an independent Craft/CMS developer through Malt or Upwork well in advance of needing them.</p>
+</div>
+</div>
+
+<!-- 06 COSTS -->
+<div id="costs" class="cost-section">
+  <div style="max-width:1100px; margin:0 auto;">
+    <div class="section-label">06 — Cost Analysis</div>
+    <h2>Full Financial Picture</h2>
+    <p style="color:rgba(255,255,255,0.6); font-size:15px; max-width:600px; margin-bottom:40px;">Every cost, before and after. Including the one-time migration investment and annual savings going forward.</p>
+
+    <div class="cost-grid">
+      <div>
+        <div class="cost-col-title">CURRENT ANNUAL COSTS</div>
+        <div class="cost-row"><span class="cost-row-label">Netlify frontend hosting (via Lucid)</span><span class="cost-row-val red">CHF 120</span></div>
+        <div class="cost-row"><span class="cost-row-label">Craft CMS Pro + 3 Plugins</span><span class="cost-row-val red">CHF 172</span></div>
+        <div class="cost-row"><span class="cost-row-label">Font licenses (Helvetica Neue)</span><span class="cost-row-val red">CHF 46.47</span></div>
+        <div class="cost-row"><span class="cost-row-label">Hostinger backend server</span><span class="cost-row-val red">~CHF 130</span></div>
+        <div class="cost-row"><span class="cost-row-label">Buddy CI/CD (absorbed by Lucid)</span><span class="cost-row-val" style="color:rgba(255,255,255,0.4);">Hidden</span></div>
+        <div class="cost-row"><span class="cost-row-label">Developer hours for minor changes</span><span class="cost-row-val red">CHF 190/h</span></div>
+        <div class="cost-total"><span class="cost-total-label">Annual Total</span><span class="cost-total-val">~CHF 468+</span></div>
+      </div>
+      <div>
+        <div class="cost-col-title after">POST-MIGRATION ANNUAL COSTS</div>
+        <div class="cost-row"><span class="cost-row-label">Azure Static Web Apps (frontend)</span><span class="cost-row-val free">$0 — Free tier</span></div>
+        <div class="cost-row"><span class="cost-row-label">Azure hosting (App Service + MySQL + Blob)</span><span class="cost-row-val free">$0 — Covered by NPO credits</span></div>
+        <div class="cost-row"><span class="cost-row-label">CMS (open source alternative)</span><span class="cost-row-val free">$0 — Free forever</span></div>
+        <div class="cost-row"><span class="cost-row-label">Fonts (Montserrat via Google Fonts)</span><span class="cost-row-val free">$0 — Self-hosted</span></div>
+        <div class="cost-row"><span class="cost-row-label">GitHub (NPO programme)</span><span class="cost-row-val free">$0</span></div>
+        <div class="cost-row"><span class="cost-row-label">Developer hours for minor changes</span><span class="cost-row-val free">$0 — Done in-house</span></div>
+        <div class="cost-total"><span class="cost-total-label">Annual Total</span><span class="cost-total-val green">CHF 0 – 172*</span></div>
+      </div>
+    </div>
+
+    <p style="color:rgba(255,255,255,0.35); font-size:12px; margin-top:16px;">* CHF 172 only if we choose to keep Craft CMS. Switching to a free CMS eliminates this entirely.</p>
+
+    <div style="margin-top:48px;">
+      <div class="cost-col-title" style="color:rgba(255,255,255,0.4);">ONE-TIME MIGRATION INVESTMENT</div>
+      <div class="cost-row"><span class="cost-row-label">Independent developer (4–7 hours @ CHF 80–120/h)</span><span class="cost-row-val">CHF 320–840</span></div>
+      <div class="cost-row"><span class="cost-row-label">Thomas's time (IT, already budgeted)</span><span class="cost-row-val free">Internal</span></div>
+      <div class="cost-row"><span class="cost-row-label">Azure setup, DNS migration, testing</span><span class="cost-row-val free">$0</span></div>
+      <div class="cost-total"><span class="cost-total-label">One-Time Total</span><span class="cost-total-val">CHF 320–840</span></div>
+    </div>
+
+    <div style="margin-top:40px; background:rgba(74,222,128,0.08); border:1px solid rgba(74,222,128,0.2); padding:28px;">
+      <div style="font-size:11px; font-weight:700; letter-spacing:2px; color:#4ade80; margin-bottom:16px; text-transform:uppercase;">Break-Even Analysis</div>
+      <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:24px;">
+        <div>
+          <div style="font-size:28px; font-weight:800; color:white;">~8 months</div>
+          <div style="font-size:12px; color:rgba(255,255,255,0.5); margin-top:4px;">Break-even on migration cost at maximum spend (CHF 840)</div>
+        </div>
+        <div>
+          <div style="font-size:28px; font-weight:800; color:#4ade80;">CHF 468+</div>
+          <div style="font-size:12px; color:rgba(255,255,255,0.5); margin-top:4px;">Annual savings once migrated (excluding ad-hoc developer hours)</div>
+        </div>
+        <div>
+          <div style="font-size:28px; font-weight:800; color:#4ade80;">Year 2+</div>
+          <div style="font-size:12px; color:rgba(255,255,255,0.5); margin-top:4px;">Every subsequent year saves CHF 468+ with zero migration cost</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="savings-banner">
+  <div class="savings-text">
+    <h3>Bottom Line</h3>
+    <p>We pay once (CHF 320–840) and save every year after.</p>
+  </div>
+  <div class="savings-note">
+    Beyond the financial savings, we eliminate our operational dependency on a single external agency for tasks our own IT manager can handle in minutes. This is a governance and resilience issue as much as a financial one.
+  </div>
+</div>
+
+<div class="report-footer">
+  <div class="report-footer-brand">Pest<span>a</span>lozzi International</div>
+  <div class="report-footer-note">Internal — Confidential | Prepared by Thomas Lifuti, May 2026 | v1.0</div>
+</div>
+
+</body>
+</html>

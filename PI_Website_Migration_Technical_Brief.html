@@ -1,0 +1,957 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Website Infrastructure Migration — Technical Brief | Pestalozzi International</title>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;700&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0d1117;
+    --surface: #161b22;
+    --surface2: #21262d;
+    --border: #30363d;
+    --text: #e6edf3;
+    --text-muted: #8b949e;
+    --text-dim: #484f58;
+    --accent: #CA0733;
+    --accent-light: #ff6b8a;
+    --green: #3fb950;
+    --blue: #58a6ff;
+    --yellow: #d29922;
+    --purple: #bc8cff;
+    --sky: #79c0ff;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Syne', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.6;
+  }
+
+  code, .mono {
+    font-family: 'JetBrains Mono', monospace;
+  }
+
+  /* COVER */
+  .cover {
+    border-bottom: 1px solid var(--border);
+    padding: 80px 64px 64px;
+    position: relative;
+    overflow: hidden;
+  }
+  .cover::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: radial-gradient(ellipse at 80% 20%, rgba(202,7,51,0.08) 0%, transparent 60%);
+    pointer-events: none;
+  }
+  .cover-breadcrumb {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: var(--text-dim);
+    margin-bottom: 48px;
+    letter-spacing: 0.5px;
+  }
+  .cover-breadcrumb span { color: var(--accent-light); }
+  .cover h1 {
+    font-size: clamp(32px, 5vw, 56px);
+    font-weight: 800;
+    line-height: 1.05;
+    margin-bottom: 20px;
+    letter-spacing: -1px;
+  }
+  .cover h1 .accent { color: var(--accent); }
+  .cover-desc {
+    font-size: 16px;
+    color: var(--text-muted);
+    max-width: 600px;
+    margin-bottom: 48px;
+    font-weight: 400;
+  }
+  .cover-meta-row {
+    display: flex;
+    gap: 32px;
+    flex-wrap: wrap;
+  }
+  .meta-chip {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    padding: 6px 12px;
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    color: var(--text-muted);
+  }
+  .meta-chip span { color: var(--text); margin-left: 6px; }
+
+  /* LAYOUT */
+  .content { max-width: 1100px; margin: 0 auto; padding: 64px; }
+
+  .section-header {
+    display: flex;
+    align-items: baseline;
+    gap: 16px;
+    margin-bottom: 32px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid var(--border);
+  }
+  .section-num {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: var(--accent);
+    font-weight: 500;
+  }
+  .section-title {
+    font-size: clamp(20px, 3vw, 28px);
+    font-weight: 700;
+    letter-spacing: -0.5px;
+  }
+
+  .prose {
+    font-size: 15px;
+    color: var(--text-muted);
+    max-width: 760px;
+    margin-bottom: 32px;
+    font-weight: 400;
+    line-height: 1.75;
+  }
+
+  .section-gap { height: 72px; border-top: 1px solid var(--border); margin-top: 72px; }
+
+  /* CODE BLOCKS */
+  .code-block {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    overflow: hidden;
+    margin: 24px 0;
+  }
+  .code-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 16px;
+    background: var(--surface2);
+    border-bottom: 1px solid var(--border);
+  }
+  .code-lang {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: var(--text-muted);
+  }
+  .code-body {
+    padding: 20px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+    line-height: 1.7;
+    overflow-x: auto;
+    white-space: pre;
+    color: var(--text);
+  }
+  .c-green { color: var(--green); }
+  .c-blue { color: var(--blue); }
+  .c-yellow { color: var(--yellow); }
+  .c-purple { color: var(--purple); }
+  .c-red { color: var(--accent-light); }
+  .c-dim { color: var(--text-dim); }
+  .c-sky { color: var(--sky); }
+
+  /* ARCH DIAGRAMS */
+  .arch-diagram {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 40px;
+    margin: 32px 0;
+    overflow-x: auto;
+  }
+  .arch-diagram-title {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: var(--text-dim);
+    margin-bottom: 32px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+  }
+
+  .flow {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin-bottom: 16px;
+  }
+  .flow-node {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 12px 16px;
+    min-width: 120px;
+    text-align: center;
+  }
+  .flow-node.green { border-color: var(--green); }
+  .flow-node.blue { border-color: var(--blue); }
+  .flow-node.red { border-color: var(--accent); }
+  .flow-node.yellow { border-color: var(--yellow); }
+  .flow-node-name { font-size: 12px; font-weight: 700; color: var(--text); }
+  .flow-node-sub { font-family: 'JetBrains Mono', monospace; font-size: 10px; color: var(--text-muted); margin-top: 4px; }
+  .flow-arrow { color: var(--text-dim); font-size: 18px; }
+
+  /* TABLES */
+  .data-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 24px 0;
+    font-size: 13px;
+  }
+  .data-table th {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--text-dim);
+    padding: 10px 16px;
+    text-align: left;
+    border-bottom: 1px solid var(--border);
+  }
+  .data-table td {
+    padding: 12px 16px;
+    border-bottom: 1px solid var(--border);
+    color: var(--text-muted);
+    vertical-align: top;
+  }
+  .data-table td:first-child { color: var(--text); font-weight: 600; }
+  .data-table tr:hover td { background: var(--surface2); }
+
+  .tag {
+    display: inline-block;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    padding: 2px 8px;
+    border-radius: 3px;
+    font-weight: 500;
+  }
+  .tag-green { background: rgba(63,185,80,0.15); color: var(--green); }
+  .tag-blue { background: rgba(88,166,255,0.15); color: var(--blue); }
+  .tag-red { background: rgba(202,7,51,0.2); color: var(--accent-light); }
+  .tag-yellow { background: rgba(210,153,34,0.15); color: var(--yellow); }
+  .tag-purple { background: rgba(188,140,255,0.15); color: var(--purple); }
+
+  /* ALERT BOXES */
+  .alert {
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 16px 20px;
+    margin: 20px 0;
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+  }
+  .alert.info { border-color: var(--blue); background: rgba(88,166,255,0.05); }
+  .alert.warn { border-color: var(--yellow); background: rgba(210,153,34,0.05); }
+  .alert.success { border-color: var(--green); background: rgba(63,185,80,0.05); }
+  .alert.danger { border-color: var(--accent); background: rgba(202,7,51,0.05); }
+  .alert-icon { font-size: 16px; flex-shrink: 0; margin-top: 2px; }
+  .alert-body { font-size: 13px; color: var(--text-muted); line-height: 1.6; }
+  .alert-body strong { color: var(--text); font-weight: 600; }
+
+  /* SPEC GRIDS */
+  .spec-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 12px;
+    margin: 24px 0;
+  }
+  .spec-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 20px;
+  }
+  .spec-card-service {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    color: var(--text-dim);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 8px;
+  }
+  .spec-card-name { font-size: 14px; font-weight: 700; margin-bottom: 4px; }
+  .spec-card-tier { font-family: 'JetBrains Mono', monospace; font-size: 12px; color: var(--blue); margin-bottom: 12px; }
+  .spec-card-specs { font-size: 12px; color: var(--text-muted); line-height: 1.7; }
+  .spec-card-cost {
+    margin-top: 14px;
+    padding-top: 12px;
+    border-top: 1px solid var(--border);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--green);
+  }
+
+  /* CHECKLIST */
+  .checklist { margin: 20px 0; }
+  .checklist-item {
+    display: flex;
+    gap: 12px;
+    padding: 10px 0;
+    border-bottom: 1px solid var(--border);
+    font-size: 14px;
+  }
+  .checklist-item:last-child { border-bottom: none; }
+  .check-box {
+    width: 18px; height: 18px;
+    border: 1px solid var(--border);
+    border-radius: 3px;
+    flex-shrink: 0;
+    margin-top: 2px;
+  }
+  .checklist-label { color: var(--text-muted); flex: 1; }
+  .checklist-label strong { color: var(--text); }
+  .checklist-tag { flex-shrink: 0; }
+
+  /* TRAFFIC STATS */
+  .stat-row {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 12px;
+    margin: 24px 0;
+  }
+  .stat-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 20px;
+  }
+  .stat-val { font-size: 28px; font-weight: 800; color: var(--text); margin-bottom: 4px; }
+  .stat-val.green { color: var(--green); }
+  .stat-val.red { color: var(--accent-light); }
+  .stat-label { font-family: 'JetBrains Mono', monospace; font-size: 10px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 1px; }
+
+  /* PHASE BLOCKS */
+  .phase-block {
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    overflow: hidden;
+    margin: 20px 0;
+  }
+  .phase-header {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 16px 20px;
+    background: var(--surface2);
+    border-bottom: 1px solid var(--border);
+  }
+  .phase-num {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: var(--accent);
+    font-weight: 700;
+  }
+  .phase-title { font-size: 15px; font-weight: 700; flex: 1; }
+  .phase-body { padding: 20px; }
+  .phase-body p { font-size: 14px; color: var(--text-muted); margin-bottom: 16px; line-height: 1.7; }
+
+  .footer {
+    border-top: 1px solid var(--border);
+    padding: 40px 64px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 16px;
+  }
+  .footer-brand {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    color: var(--text-dim);
+  }
+  .footer-brand span { color: var(--accent); }
+</style>
+</head>
+<body>
+
+<!-- COVER -->
+<div class="cover">
+  <div class="cover-breadcrumb">pestalozzi.international / <span>infrastructure-migration</span> / technical-brief-v1.md</div>
+  <h1>Website Infrastructure<br><span class="accent">Migration</span> Brief</h1>
+  <p class="cover-desc">Technical specification for migrating pestalozzi.international from Hostinger/Netlify to a self-hosted Azure stack. Prepared for the implementing developer.</p>
+  <div class="cover-meta-row">
+    <div class="meta-chip">prepared-by:<span>Thomas Lifuti, IT</span></div>
+    <div class="meta-chip">date:<span>May 2026</span></div>
+    <div class="meta-chip">version:<span>1.0</span></div>
+    <div class="meta-chip">status:<span>Active</span></div>
+    <div class="meta-chip">stack:<span>Craft CMS / Nuxt.js / PHP / MySQL</span></div>
+  </div>
+</div>
+
+<div class="content">
+
+  <!-- 01 CURRENT STACK -->
+  <div class="section-header">
+    <div class="section-num">// 01</div>
+    <div class="section-title">Current Architecture</div>
+  </div>
+
+  <p class="prose">The website is a decoupled CMS architecture: a Craft CMS backend serving content via GraphQL, consumed by a Nuxt.js/Vue.js frontend. Currently split across Hostinger (backend) and Netlify (frontend), with GitHub and Buddy handling CI/CD. All infrastructure currently sits under the agency's accounts.</p>
+
+  <div class="arch-diagram">
+    <div class="arch-diagram-title">// current-stack — as-is</div>
+
+    <div style="margin-bottom:24px;">
+      <div style="font-family:'JetBrains Mono',monospace; font-size:11px; color:var(--text-dim); margin-bottom:12px;">FRONTEND PIPELINE</div>
+      <div class="flow">
+        <div class="flow-node blue"><div class="flow-node-name">GitHub</div><div class="flow-node-sub">Frontend Repo</div></div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-node yellow"><div class="flow-node-name">Buddy CI/CD</div><div class="flow-node-sub">Build + Deploy</div></div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-node green"><div class="flow-node-name">Netlify CDN</div><div class="flow-node-sub">nuxt.js static</div></div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-node"><div class="flow-node-name">Visitor</div><div class="flow-node-sub">www.pestalozzi.international</div></div>
+      </div>
+    </div>
+
+    <div style="margin-bottom:24px;">
+      <div style="font-family:'JetBrains Mono',monospace; font-size:11px; color:var(--text-dim); margin-bottom:12px;">BACKEND / CMS</div>
+      <div class="flow">
+        <div class="flow-node blue"><div class="flow-node-name">GitHub</div><div class="flow-node-sub">Backend Repo</div></div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-node yellow"><div class="flow-node-name">Buddy CI/CD</div><div class="flow-node-sub">Atomic deploy + DB backup</div></div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-node red"><div class="flow-node-name">Hostinger VPS</div><div class="flow-node-sub">PHP 8.x / Craft CMS</div></div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-node red"><div class="flow-node-name">MySQL</div><div class="flow-node-sub">prod + staging DBs</div></div>
+      </div>
+    </div>
+
+    <div>
+      <div style="font-family:'JetBrains Mono',monospace; font-size:11px; color:var(--text-dim); margin-bottom:12px;">DATA FLOW (RUNTIME)</div>
+      <div class="flow">
+        <div class="flow-node green"><div class="flow-node-name">Netlify</div><div class="flow-node-sub">Static frontend</div></div>
+        <div class="flow-arrow">←GraphQL→</div>
+        <div class="flow-node red"><div class="flow-node-name">Craft CMS</div><div class="flow-node-sub">cms.pestalozzi.international</div></div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-node"><div class="flow-node-name">Blob Assets</div><div class="flow-node-sub">cms.pestalozzi.international/uploads</div></div>
+      </div>
+    </div>
+  </div>
+
+  <table class="data-table">
+    <thead>
+      <tr><th>Component</th><th>Technology</th><th>Hosting</th><th>Subdomains</th><th>Status</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>Frontend</td><td>Nuxt.js / Vue.js (static)</td><td>Netlify CDN</td><td>www.</td><td><span class="tag tag-yellow">Migrating</span></td></tr>
+      <tr><td>CMS / Backend</td><td>Craft CMS 4.x + PHP 8.x</td><td>Hostinger VPS</td><td>cms. / cms-staging.</td><td><span class="tag tag-yellow">Migrating</span></td></tr>
+      <tr><td>Database</td><td>MySQL 8.0</td><td>Hostinger (shared)</td><td>—</td><td><span class="tag tag-yellow">Migrating</span></td></tr>
+      <tr><td>Assets/Uploads</td><td>Local filesystem</td><td>Hostinger VPS</td><td>cms. /uploads</td><td><span class="tag tag-yellow">Migrating</span></td></tr>
+      <tr><td>CI/CD</td><td>Buddy</td><td>Buddy.works SaaS</td><td>—</td><td><span class="tag tag-red">Replacing</span></td></tr>
+      <tr><td>DNS</td><td>Cloudflare</td><td>PI-owned</td><td>All</td><td><span class="tag tag-green">Staying</span></td></tr>
+      <tr><td>Analytics</td><td>Plausible</td><td>Plausible SaaS</td><td>—</td><td><span class="tag tag-green">Staying</span></td></tr>
+    </tbody>
+  </table>
+
+  <div class="alert info">
+    <div class="alert-icon">ℹ️</div>
+    <div class="alert-body"><strong>PHP version to confirm:</strong> Please verify the exact PHP version running on Hostinger before provisioning App Service. SSH in and run <code>php -v</code>. Target Azure to match exactly.</div>
+  </div>
+
+  <div class="section-gap"></div>
+
+  <!-- 02 TARGET STACK -->
+  <div class="section-header">
+    <div class="section-num">// 02</div>
+    <div class="section-title">Target Architecture</div>
+  </div>
+
+  <p class="prose">Full migration to Azure, with the frontend moving to Azure Static Web Apps (free tier) and the backend stack replacing Hostinger with three managed Azure services. CI/CD moves from Buddy to GitHub Actions. Thomas will handle Azure provisioning, database export, and file transfer. Developer scope is CMS reconfiguration, Blob adapter, and GitHub Actions workflow.</p>
+
+  <div class="arch-diagram">
+    <div class="arch-diagram-title">// target-stack — post-migration</div>
+
+    <div style="margin-bottom:24px;">
+      <div style="font-family:'JetBrains Mono',monospace; font-size:11px; color:var(--green); margin-bottom:12px;">FRONTEND PIPELINE — NEW</div>
+      <div class="flow">
+        <div class="flow-node blue"><div class="flow-node-name">GitHub</div><div class="flow-node-sub">PI-owned repo</div></div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-node green"><div class="flow-node-name">GitHub Actions</div><div class="flow-node-sub">replaces Buddy</div></div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-node green"><div class="flow-node-name">Azure Static Web Apps</div><div class="flow-node-sub">replaces Netlify — free tier</div></div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-node"><div class="flow-node-name">Visitor</div><div class="flow-node-sub">www.pestalozzi.international</div></div>
+      </div>
+    </div>
+
+    <div style="margin-bottom:24px;">
+      <div style="font-family:'JetBrains Mono',monospace; font-size:11px; color:var(--green); margin-bottom:12px;">BACKEND / CMS — NEW</div>
+      <div class="flow">
+        <div class="flow-node blue"><div class="flow-node-name">GitHub</div><div class="flow-node-sub">PI-owned repo</div></div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-node green"><div class="flow-node-name">GitHub Actions</div><div class="flow-node-sub">SSH deploy to App Service</div></div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-node green"><div class="flow-node-name">Azure App Service</div><div class="flow-node-sub">Linux / PHP 8.x / B1</div></div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-node green"><div class="flow-node-name">Azure MySQL</div><div class="flow-node-sub">Flexible Server B1ms</div></div>
+      </div>
+    </div>
+
+    <div>
+      <div style="font-family:'JetBrains Mono',monospace; font-size:11px; color:var(--green); margin-bottom:12px;">ASSETS — NEW</div>
+      <div class="flow">
+        <div class="flow-node green"><div class="flow-node-name">Craft CMS</div><div class="flow-node-sub">on App Service</div></div>
+        <div class="flow-arrow">→ Craft Blob Adapter →</div>
+        <div class="flow-node green"><div class="flow-node-name">Azure Blob Storage</div><div class="flow-node-sub">replaces local /uploads</div></div>
+        <div class="flow-arrow">→ CDN URL →</div>
+        <div class="flow-node"><div class="flow-node-name">Frontend</div><div class="flow-node-sub">GraphQL asset URLs</div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="spec-grid">
+    <div class="spec-card">
+      <div class="spec-card-service">Azure // Frontend</div>
+      <div class="spec-card-name">Static Web Apps</div>
+      <div class="spec-card-tier">Free Tier (F1)</div>
+      <div class="spec-card-specs">
+        100 GB bandwidth/month<br>
+        Custom domains + SSL<br>
+        Global CDN<br>
+        GitHub Actions native integration<br>
+        Auto SSL renewal
+      </div>
+      <div class="spec-card-cost">$0.00 / month</div>
+    </div>
+    <div class="spec-card">
+      <div class="spec-card-service">Azure // Backend</div>
+      <div class="spec-card-name">App Service Linux</div>
+      <div class="spec-card-tier">B1 (start here)</div>
+      <div class="spec-card-specs">
+        1 vCPU, 1.75 GB RAM<br>
+        PHP 8.x runtime<br>
+        SSH access enabled<br>
+        Composer available<br>
+        Scale to B2 if needed
+      </div>
+      <div class="spec-card-cost">~$13–18 / month</div>
+    </div>
+    <div class="spec-card">
+      <div class="spec-card-service">Azure // Database</div>
+      <div class="spec-card-name">MySQL Flexible Server</div>
+      <div class="spec-card-tier">Burstable B1ms</div>
+      <div class="spec-card-specs">
+        1 vCPU, 2 GB RAM<br>
+        MySQL 8.0<br>
+        7-day auto backup<br>
+        Point-in-time restore<br>
+        SSL enforced
+      </div>
+      <div class="spec-card-cost">~$20–25 / month</div>
+    </div>
+    <div class="spec-card">
+      <div class="spec-card-service">Azure // Storage</div>
+      <div class="spec-card-name">Blob Storage</div>
+      <div class="spec-card-tier">LRS — Hot tier</div>
+      <div class="spec-card-specs">
+        Replaces /web/uploads<br>
+        Craft flysystem adapter<br>
+        CDN-accessible URLs<br>
+        ~50 GB initial estimate<br>
+        Auto-scales
+      </div>
+      <div class="spec-card-cost">~$1–2 / month</div>
+    </div>
+  </div>
+
+  <div class="section-gap"></div>
+
+  <!-- 03 ASSETS NEEDED -->
+  <div class="section-header">
+    <div class="section-num">// 03</div>
+    <div class="section-title">Assets to Be Provided by Current Agency</div>
+  </div>
+
+  <p class="prose">The following assets are being requested from the current agency in writing. Developer work cannot begin on Phase 3 without these. Thomas is handling the request and will provide all of the below once received.</p>
+
+  <div class="checklist">
+    <div class="checklist-item">
+      <div class="check-box"></div>
+      <div class="checklist-label"><strong>GitHub repository access</strong> — both frontend (Nuxt.js) and backend (Craft CMS) repos. PI to be added as owner.</div>
+      <span class="checklist-tag"><span class="tag tag-red">Blocking</span></span>
+    </div>
+    <div class="checklist-item">
+      <div class="check-box"></div>
+      <div class="checklist-label"><strong>.env file (production)</strong> — complete, including DB credentials, Craft license key, all plugin keys, any API keys, S3/storage config if present.</div>
+      <span class="checklist-tag"><span class="tag tag-red">Blocking</span></span>
+    </div>
+    <div class="checklist-item">
+      <div class="check-box"></div>
+      <div class="checklist-label"><strong>Craft CMS license key</strong> — and all plugin license keys: Navigation, SEOmatic, Neo.</div>
+      <span class="checklist-tag"><span class="tag tag-red">Blocking</span></span>
+    </div>
+    <div class="checklist-item">
+      <div class="check-box"></div>
+      <div class="checklist-label"><strong>Buddy pipeline configuration</strong> — exported pipeline steps / YAML for both frontend and backend deploys.</div>
+      <span class="checklist-tag"><span class="tag tag-yellow">Required</span></span>
+    </div>
+    <div class="checklist-item">
+      <div class="check-box"></div>
+      <div class="checklist-label"><strong>Any cron jobs</strong> — list of cron tasks configured on the Hostinger server (e.g. Craft queue runner).</div>
+      <span class="checklist-tag"><span class="tag tag-yellow">Required</span></span>
+    </div>
+    <div class="checklist-item">
+      <div class="check-box"></div>
+      <div class="checklist-label"><strong>PHP version confirmation</strong> — exact version running in production on Hostinger.</div>
+      <span class="checklist-tag"><span class="tag tag-blue">Info</span></span>
+    </div>
+  </div>
+
+  <div class="alert warn">
+    <div class="alert-icon">⚠️</div>
+    <div class="alert-body"><strong>Note for developer:</strong> Thomas has Hostinger panel access and can independently export the MySQL database (via phpMyAdmin) and download all web files via File Manager/SFTP. You will not need Lucid's cooperation for the data migration itself — only for the items listed above.</div>
+  </div>
+
+  <div class="section-gap"></div>
+
+  <!-- 04 DEVELOPER SCOPE -->
+  <div class="section-header">
+    <div class="section-num">// 04</div>
+    <div class="section-title">Developer Scope of Work</div>
+  </div>
+
+  <p class="prose">Thomas handles: Azure provisioning, database export and import, file transfer, DNS cutover on Cloudflare, and Azure Static Web Apps setup. The following tasks are the contracted developer scope:</p>
+
+  <div class="phase-block">
+    <div class="phase-header">
+      <div class="phase-num">TASK-01</div>
+      <div class="phase-title">Craft CMS — Environment Reconfiguration for Azure</div>
+      <span class="tag tag-blue">~2h estimated</span>
+    </div>
+    <div class="phase-body">
+      <p>Update <code>.env</code> for Azure MySQL connection string. Verify <code>config/db.php</code> and <code>config/general.php</code> for environment-specific settings. Run <code>php craft migrate/all</code> and <code>php craft project-config/apply</code> post-deploy. Confirm Craft admin accessible at <code>cms.pestalozzi.international</code>.</p>
+      <div class="code-block">
+        <div class="code-header"><span class="code-lang">bash — .env changes required</span></div>
+        <div class="code-body"><span class="c-dim"># Current (Hostinger)</span>
+<span class="c-blue">DB_DRIVER</span>=<span class="c-green">mysql</span>
+<span class="c-blue">DB_SERVER</span>=<span class="c-green">localhost</span>
+<span class="c-blue">DB_PORT</span>=<span class="c-green">3306</span>
+<span class="c-blue">DB_DATABASE</span>=<span class="c-green">craft_prod</span>
+<span class="c-blue">DB_USER</span>=<span class="c-green">[from_hostinger]</span>
+<span class="c-blue">DB_PASSWORD</span>=<span class="c-green">[from_hostinger]</span>
+
+<span class="c-dim"># Target (Azure MySQL Flexible Server)</span>
+<span class="c-blue">DB_SERVER</span>=<span class="c-green">[name].mysql.database.azure.com</span>
+<span class="c-blue">DB_PORT</span>=<span class="c-green">3306</span>
+<span class="c-blue">DB_DATABASE</span>=<span class="c-green">craft_prod</span>
+<span class="c-blue">DB_USER</span>=<span class="c-green">[azureuser]@[name]</span>
+<span class="c-blue">DB_PASSWORD</span>=<span class="c-green">[azure_password]</span>
+<span class="c-blue">MYSQL_ATTR_SSL_CA</span>=<span class="c-green">/etc/ssl/certs/DigiCertGlobalRootCA.crt.pem</span>
+</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="phase-block">
+    <div class="phase-header">
+      <div class="phase-num">TASK-02</div>
+      <div class="phase-title">Azure Blob Storage — Craft Flysystem Adapter</div>
+      <span class="tag tag-blue">~2h estimated</span>
+    </div>
+    <div class="phase-body">
+      <p>Install and configure the Azure Blob Storage adapter for Craft's asset filesystems. App Service does not provide persistent local disk — uploads must be redirected to Blob. Use <code>craftcms/flysystem-azure-blob-storage</code> or equivalent. Update filesystem config in Craft admin and <code>config/filesystems.php</code>. Migrate existing <code>web/uploads</code> contents to Blob container.</p>
+      <div class="code-block">
+        <div class="code-header"><span class="code-lang">bash — composer install</span></div>
+        <div class="code-body"><span class="c-green">composer</span> require craftcms/flysystem-azure-blob-storage</div>
+      </div>
+      <div class="code-block">
+        <div class="code-header"><span class="code-lang">php — config/filesystems.php</span></div>
+        <div class="code-body"><span class="c-purple">return</span> [
+  <span class="c-green">'assets'</span> => [
+    <span class="c-green">'driver'</span>    => <span class="c-green">'azure'</span>,
+    <span class="c-green">'account'</span>   => <span class="c-sky">App::</span><span class="c-blue">env</span>(<span class="c-green">'AZURE_BLOB_ACCOUNT'</span>),
+    <span class="c-green">'key'</span>       => <span class="c-sky">App::</span><span class="c-blue">env</span>(<span class="c-green">'AZURE_BLOB_KEY'</span>),
+    <span class="c-green">'container'</span> => <span class="c-sky">App::</span><span class="c-blue">env</span>(<span class="c-green">'AZURE_BLOB_CONTAINER'</span>),
+    <span class="c-green">'url'</span>       => <span class="c-sky">App::</span><span class="c-blue">env</span>(<span class="c-green">'AZURE_BLOB_URL'</span>),
+  ],
+];</div>
+      </div>
+      <div class="alert info" style="margin-top:16px;">
+        <div class="alert-icon">ℹ️</div>
+        <div class="alert-body"><strong>Asset URL update:</strong> After moving uploads to Blob, all existing GraphQL asset URLs will change from <code>cms.pestalozzi.international/uploads/…</code> to the Blob CDN URL. Verify the Nuxt frontend handles this correctly — check the GraphQL asset URL transform config.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="phase-block">
+    <div class="phase-header">
+      <div class="phase-num">TASK-03</div>
+      <div class="phase-title">GitHub Actions — CI/CD Pipeline (replaces Buddy)</div>
+      <span class="tag tag-blue">~1.5h estimated</span>
+    </div>
+    <div class="phase-body">
+      <p>Create two GitHub Actions workflows: one for the Nuxt.js frontend (deploy to Azure Static Web Apps), one for the Craft CMS backend (SSH deploy to App Service, run migrations). Thomas will provide Buddy pipeline config as reference. Secrets to be added to GitHub repo settings by Thomas.</p>
+      <div class="code-block">
+        <div class="code-header"><span class="code-lang">yaml — .github/workflows/deploy-backend.yml (skeleton)</span></div>
+        <div class="code-body"><span class="c-blue">name:</span> Deploy Backend to Azure
+
+<span class="c-blue">on:</span>
+  <span class="c-blue">push:</span>
+    <span class="c-blue">branches:</span> [<span class="c-green">main</span>]
+
+<span class="c-blue">jobs:</span>
+  <span class="c-blue">deploy:</span>
+    <span class="c-blue">runs-on:</span> <span class="c-green">ubuntu-latest</span>
+    <span class="c-blue">steps:</span>
+      - <span class="c-blue">uses:</span> <span class="c-green">actions/checkout@v4</span>
+      - <span class="c-blue">name:</span> <span class="c-green">Backup DB before deploy</span>
+        <span class="c-blue">run:</span> <span class="c-dim"># mysqldump via SSH to Azure MySQL</span>
+      - <span class="c-blue">name:</span> <span class="c-green">Deploy via SSH</span>
+        <span class="c-blue">uses:</span> <span class="c-green">appleboy/ssh-action@v1</span>
+        <span class="c-blue">with:</span>
+          <span class="c-blue">host:</span> <span class="c-sky">${{ secrets.AZURE_APP_HOST }}</span>
+          <span class="c-blue">username:</span> <span class="c-sky">${{ secrets.AZURE_SSH_USER }}</span>
+          <span class="c-blue">key:</span> <span class="c-sky">${{ secrets.AZURE_SSH_KEY }}</span>
+          <span class="c-blue">script:</span> |
+            cd /home/site/wwwroot
+            git pull origin main
+            composer install --no-dev
+            php craft migrate/all
+            php craft project-config/apply
+</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="phase-block">
+    <div class="phase-header">
+      <div class="phase-num">TASK-04</div>
+      <div class="phase-title">App Service Configuration & Queue Runner</div>
+      <span class="tag tag-blue">~0.5h estimated</span>
+    </div>
+    <div class="phase-body">
+      <p>Configure PHP settings on App Service (memory_limit, upload_max_filesize, max_execution_time). Set up the Craft queue runner as a background process or WebJob. Confirm any cron jobs from Hostinger are replicated (e.g. <code>php craft queue/run</code> scheduling).</p>
+      <div class="code-block">
+        <div class="code-header"><span class="code-lang">ini — php.ini overrides (App Service configuration panel)</span></div>
+        <div class="code-body">memory_limit = 256M
+upload_max_filesize = 64M
+post_max_size = 64M
+max_execution_time = 120</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section-gap"></div>
+
+  <!-- 05 STAGING ENVIRONMENTS -->
+  <div class="section-header">
+    <div class="section-num">// 05</div>
+    <div class="section-title">Staging Environment</div>
+  </div>
+
+  <p class="prose">Hostinger currently runs production + staging (cms-staging.pestalozzi.international). On Azure, staging can be implemented as an App Service deployment slot (included in B1+) or as a separate low-cost App Service. Recommendation: start with a single deployment slot, upgrade if needed.</p>
+
+  <table class="data-table">
+    <thead>
+      <tr><th>Environment</th><th>Current URL</th><th>Target URL</th><th>Approach</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>Production CMS</td><td>cms.pestalozzi.international</td><td>cms.pestalozzi.international</td><td>App Service production slot</td></tr>
+      <tr><td>Staging CMS</td><td>cms-staging.pestalozzi.international</td><td>cms-staging.pestalozzi.international</td><td>App Service staging slot</td></tr>
+      <tr><td>Production Frontend</td><td>www.pestalozzi.international</td><td>www.pestalozzi.international</td><td>Azure Static Web Apps (prod)</td></tr>
+      <tr><td>Staging Frontend</td><td>staging.pestalozzi.international</td><td>staging.pestalozzi.international</td><td>Static Web Apps preview env</td></tr>
+    </tbody>
+  </table>
+
+  <div class="section-gap"></div>
+
+  <!-- 06 TRAFFIC & SIZING -->
+  <div class="section-header">
+    <div class="section-num">// 06</div>
+    <div class="section-title">Traffic Profile & Sizing Rationale</div>
+  </div>
+
+  <p class="prose">91-day Plausible data used to inform tier selection. Note significant bot traffic inflating raw numbers.</p>
+
+  <div class="stat-row">
+    <div class="stat-card">
+      <div class="stat-val">~1,960</div>
+      <div class="stat-label">Real human visitors/month</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-val">~4,500</div>
+      <div class="stat-label">Real pageviews/month</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-val red">49%</div>
+      <div class="stat-label">Bot / VPN traffic (China + anon VPN)</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-val">~1.7 GB</div>
+      <div class="stat-label">Estimated bandwidth/month (raw)</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-val">226</div>
+      <div class="stat-label">Peak visitors (single day)</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-val green">&lt;1 GB</div>
+      <div class="stat-label">Real bandwidth (post bot-filter)</div>
+    </div>
+  </div>
+
+  <div class="alert success">
+    <div class="alert-icon">✅</div>
+    <div class="alert-body"><strong>Sizing verdict:</strong> B1 App Service is appropriate for this traffic profile. A low-traffic CMS serving GraphQL to a static frontend will not stress B1. Monitor CPU/RAM for first 30 days; upgrade to B2 only if sustained &gt;70% CPU is observed. Azure Static Web Apps free tier (100 GB/month) is vastly oversized for actual needs.</div>
+  </div>
+
+  <div class="alert warn">
+    <div class="alert-icon">⚠️</div>
+    <div class="alert-body"><strong>Bot mitigation:</strong> Cloudflare proxy should be enabled on DNS records post-migration (Thomas handles this). This will eliminate bot traffic reaching the origin server. Consider adding a <code>robots.txt</code> update and Cloudflare bot challenge for high-frequency bot sources.</div>
+  </div>
+
+  <div class="section-gap"></div>
+
+  <!-- 07 DNS CUTOVER -->
+  <div class="section-header">
+    <div class="section-num">// 07</div>
+    <div class="section-title">DNS Cutover Plan</div>
+  </div>
+
+  <p class="prose">DNS is managed on Cloudflare. Thomas has full access. Recommend TTL reduction 24h before cutover. Run old and new in parallel until confirmation.</p>
+
+  <table class="data-table">
+    <thead>
+      <tr><th>Record</th><th>Type</th><th>Current Target</th><th>New Target</th><th>Who</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>www</td><td>CNAME</td><td>Netlify URL</td><td>Azure Static Web Apps URL</td><td><span class="tag tag-green">Thomas</span></td></tr>
+      <tr><td>cms</td><td>A / CNAME</td><td>Hostinger IP</td><td>Azure App Service URL</td><td><span class="tag tag-green">Thomas</span></td></tr>
+      <tr><td>cms-staging</td><td>A / CNAME</td><td>Hostinger IP</td><td>App Service staging slot</td><td><span class="tag tag-green">Thomas</span></td></tr>
+      <tr><td>staging</td><td>CNAME</td><td>Netlify preview</td><td>Static Web Apps staging env</td><td><span class="tag tag-green">Thomas</span></td></tr>
+    </tbody>
+  </table>
+
+  <div class="code-block">
+    <div class="code-header"><span class="code-lang">bash — pre-cutover checklist</span></div>
+    <div class="code-body"><span class="c-dim"># 24h before</span>
+<span class="c-green">□</span> Reduce all DNS record TTLs to 60s in Cloudflare
+<span class="c-green">□</span> Confirm new stack fully functional on test URLs
+
+<span class="c-dim"># Cutover day (recommend Tue–Thu)</span>
+<span class="c-green">□</span> Take final DB backup from Hostinger
+<span class="c-green">□</span> Import any delta content to Azure MySQL
+<span class="c-green">□</span> Update www CNAME → Azure Static Web Apps
+<span class="c-green">□</span> Update cms A record → Azure App Service
+<span class="c-green">□</span> Verify SSL cert auto-provisioned on Azure
+<span class="c-green">□</span> Test all critical paths: homepage, CMS login, GraphQL, asset URLs
+<span class="c-green">□</span> Enable Cloudflare proxy (orange cloud) on all records
+
+<span class="c-dim"># 48h after</span>
+<span class="c-green">□</span> Confirm no issues in Azure Monitor / App Service logs
+<span class="c-green">□</span> Cancel Hostinger
+<span class="c-green">□</span> Cancel Netlify (or migrate to PI's own free account)</div>
+  </div>
+
+  <div class="section-gap"></div>
+
+  <!-- 08 COST SUMMARY -->
+  <div class="section-header">
+    <div class="section-num">// 08</div>
+    <div class="section-title">Infrastructure Cost Summary</div>
+  </div>
+
+  <table class="data-table">
+    <thead>
+      <tr><th>Service</th><th>Tier</th><th>Region</th><th>Monthly (USD)</th><th>Annual (USD)</th><th>Notes</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>Azure Static Web Apps</td><td>Free (F1)</td><td>West Europe</td><td class="c-green">$0</td><td class="c-green">$0</td><td>100 GB bw, custom domain, SSL</td></tr>
+      <tr><td>Azure App Service Linux</td><td>B1</td><td>West Europe</td><td>~$18</td><td>~$216</td><td>Start B1, upgrade to B2 if needed</td></tr>
+      <tr><td>Azure MySQL Flexible</td><td>Burstable B1ms</td><td>West Europe</td><td>~$25</td><td>~$300</td><td>Auto-backup 7 days included</td></tr>
+      <tr><td>Azure Blob Storage</td><td>LRS Hot</td><td>West Europe</td><td>~$2</td><td>~$24</td><td>~50GB estimate</td></tr>
+      <tr><td><strong>Total Azure</strong></td><td>—</td><td>—</td><td><strong>~$45</strong></td><td><strong>~$540</strong></td><td>All covered by $2,000 NPO credits</td></tr>
+    </tbody>
+  </table>
+
+  <div class="alert success">
+    <div class="alert-icon">✅</div>
+    <div class="alert-body"><strong>NPO credits:</strong> PI holds $2,000/year in Microsoft Azure NPO credits. At ~$540/year infrastructure cost, this leaves $1,460 headroom annually — sufficient for a staging environment, additional storage, or future services without any cash outlay.</div>
+  </div>
+
+  <div class="section-gap"></div>
+
+  <!-- 09 ACCEPTANCE CRITERIA -->
+  <div class="section-header">
+    <div class="section-num">// 09</div>
+    <div class="section-title">Acceptance Criteria</div>
+  </div>
+
+  <p class="prose">Migration is considered complete when all of the following are verified:</p>
+
+  <div class="checklist">
+    <div class="checklist-item">
+      <div class="check-box"></div>
+      <div class="checklist-label"><strong>Craft CMS admin</strong> accessible at cms.pestalozzi.international with all content intact</div>
+      <span class="checklist-tag"><span class="tag tag-red">Required</span></span>
+    </div>
+    <div class="checklist-item">
+      <div class="check-box"></div>
+      <div class="checklist-label"><strong>Frontend</strong> fully loading at www.pestalozzi.international — all pages, languages (EN + DE), navigation</div>
+      <span class="checklist-tag"><span class="tag tag-red">Required</span></span>
+    </div>
+    <div class="checklist-item">
+      <div class="check-box"></div>
+      <div class="checklist-label"><strong>GraphQL endpoint</strong> responding correctly to frontend data requests</div>
+      <span class="checklist-tag"><span class="tag tag-red">Required</span></span>
+    </div>
+    <div class="checklist-item">
+      <div class="check-box"></div>
+      <div class="checklist-label"><strong>Asset URLs</strong> — all images and uploaded documents loading correctly (Blob Storage)</div>
+      <span class="checklist-tag"><span class="tag tag-red">Required</span></span>
+    </div>
+    <div class="checklist-item">
+      <div class="check-box"></div>
+      <div class="checklist-label"><strong>GitHub Actions</strong> — push to main triggers successful deploy of both frontend and backend</div>
+      <span class="checklist-tag"><span class="tag tag-red">Required</span></span>
+    </div>
+    <div class="checklist-item">
+      <div class="check-box"></div>
+      <div class="checklist-label"><strong>Content publishing</strong> — creating/editing/publishing content in Craft reflects on live site</div>
+      <span class="checklist-tag"><span class="tag tag-red">Required</span></span>
+    </div>
+    <div class="checklist-item">
+      <div class="check-box"></div>
+      <div class="checklist-label"><strong>SSL certificates</strong> valid on all subdomains (www, cms, cms-staging)</div>
+      <span class="checklist-tag"><span class="tag tag-red">Required</span></span>
+    </div>
+    <div class="checklist-item">
+      <div class="check-box"></div>
+      <div class="checklist-label"><strong>Craft queue</strong> runner operational (email sending, image transforms)</div>
+      <span class="checklist-tag"><span class="tag tag-yellow">Required</span></span>
+    </div>
+    <div class="checklist-item">
+      <div class="check-box"></div>
+      <div class="checklist-label"><strong>Staging environment</strong> accessible and functioning independently from production</div>
+      <span class="checklist-tag"><span class="tag tag-yellow">Required</span></span>
+    </div>
+    <div class="checklist-item">
+      <div class="check-box"></div>
+      <div class="checklist-label"><strong>Documentation</strong> — brief runbook for Thomas: how to SSH in, restart services, check logs</div>
+      <span class="checklist-tag"><span class="tag tag-blue">Requested</span></span>
+    </div>
+  </div>
+
+</div>
+
+<div class="footer">
+  <div class="footer-brand">pest<span>a</span>lozzi.international / infrastructure-migration-brief-v1</div>
+  <div style="font-family:'JetBrains Mono',monospace; font-size:11px; color:var(--text-dim);">Thomas Lifuti — IT Manager | May 2026</div>
+</div>
+
+</body>
+</html>

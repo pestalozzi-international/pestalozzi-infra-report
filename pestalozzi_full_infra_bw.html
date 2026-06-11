@@ -1,0 +1,511 @@
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:var(--font-sans)}
+.wrap{padding:24px 0;color:var(--color-text-primary)}
+.zone{border:1px dashed var(--color-border-secondary);border-radius:12px;padding:12px 16px 16px;margin-bottom:20px;position:relative}
+.zone-label{font-size:11px;color:var(--color-text-tertiary);letter-spacing:.08em;text-transform:uppercase;margin-bottom:12px;font-style:italic}
+.row{display:flex;gap:12px;flex-wrap:wrap}
+.node{border:1px solid var(--color-border-primary);border-radius:8px;padding:10px 14px;cursor:pointer;flex:1;min-width:140px;transition:background .15s}
+.node:hover{background:var(--color-background-secondary)}
+.node.active{border-color:var(--color-text-primary);background:var(--color-background-secondary)}
+.node-title{font-size:13px;font-weight:500;color:var(--color-text-primary);margin-bottom:2px}
+.node-sub{font-size:11px;color:var(--color-text-secondary)}
+.node-badge{display:inline-block;font-size:10px;padding:1px 6px;border-radius:4px;border:1px solid var(--color-border-secondary);color:var(--color-text-tertiary);margin-top:4px}
+.connector-row{display:flex;align-items:center;justify-content:center;gap:0;margin:4px 0;color:var(--color-text-tertiary);font-size:11px}
+.arrow{height:24px;display:flex;flex-direction:column;align-items:center;gap:2px;position:relative}
+.arrow-line{width:1px;flex:1;background:var(--color-border-secondary)}
+.arrow-head{width:0;height:0;border-left:4px solid transparent;border-right:4px solid transparent;border-top:5px solid var(--color-border-secondary)}
+.arrow-label{font-size:10px;color:var(--color-text-tertiary);white-space:nowrap}
+.arrow-dashed .arrow-line{background:repeating-linear-gradient(to bottom,var(--color-border-secondary) 0,var(--color-border-secondary) 3px,transparent 3px,transparent 6px)}
+.detail{border:1px solid var(--color-border-secondary);border-radius:10px;background:var(--color-background-secondary);padding:16px;margin-top:16px;display:none}
+.detail.open{display:block}
+.detail h3{font-size:14px;font-weight:500;margin-bottom:10px;color:var(--color-text-primary)}
+.detail-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.detail-item{background:var(--color-background-primary);border:1px solid var(--color-border-tertiary);border-radius:6px;padding:10px 12px}
+.detail-item-title{font-size:12px;font-weight:500;color:var(--color-text-primary);margin-bottom:3px}
+.detail-item-body{font-size:11px;color:var(--color-text-secondary);line-height:1.5}
+.detail-close{float:right;font-size:11px;color:var(--color-text-tertiary);cursor:pointer;text-decoration:underline;margin-top:-2px}
+.conn-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-top:8px}
+.conn-item{font-size:11px;color:var(--color-text-secondary);background:var(--color-background-primary);border:1px solid var(--color-border-tertiary);border-radius:5px;padding:7px 9px}
+.conn-item b{display:block;font-size:11px;font-weight:500;color:var(--color-text-primary);margin-bottom:2px}
+.phase-pills{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}
+.pill{font-size:10px;padding:2px 8px;border-radius:20px;border:1px solid var(--color-border-secondary);color:var(--color-text-secondary)}
+.pill.now{border-color:var(--color-text-primary);color:var(--color-text-primary)}
+</style>
+
+<div class="wrap">
+
+<div class="zone">
+  <div class="zone-label">people</div>
+  <div class="row">
+    <div class="node" onclick="toggle('d-editors')">
+      <div class="node-title">Content editors</div>
+      <div class="node-sub">news · stories · events · team</div>
+      <div class="node-badge">non-technical</div>
+    </div>
+    <div class="node" onclick="toggle('d-media')">
+      <div class="node-title">Media team</div>
+      <div class="node-sub">photos · videos · brand assets</div>
+      <div class="node-badge">non-technical</div>
+    </div>
+    <div class="node" onclick="toggle('d-dev')">
+      <div class="node-title">Developer</div>
+      <div class="node-sub">UI · code · deploy · integrations</div>
+      <div class="node-badge">technical</div>
+    </div>
+  </div>
+
+  <div class="detail" id="d-editors">
+    <span class="detail-close" onclick="toggle('d-editors')">close</span>
+    <h3>Content editor workflow</h3>
+    <div class="detail-grid">
+      <div class="detail-item">
+        <div class="detail-item-title">Phase 1 — now</div>
+        <div class="detail-item-body">Content is hardcoded in the app's route files. Editors cannot self-serve. Any text or image change requires the developer to update code in Lovable and redeploy.</div>
+      </div>
+      <div class="detail-item">
+        <div class="detail-item-title">Phase 2 — Payload live</div>
+        <div class="detail-item-body">Editors log into Payload CMS at cms.pestalozzi.org. They write articles, update team bios, manage events. Changes publish to the live site with no developer involvement.</div>
+      </div>
+      <div class="detail-item">
+        <div class="detail-item-title">What they manage in Payload</div>
+        <div class="detail-item-body">News articles · Alumni stories · Events · Team members · Programme pages · Job listings · Page hero content</div>
+      </div>
+      <div class="detail-item">
+        <div class="detail-item-title">What they never touch</div>
+        <div class="detail-item-body">GitHub · Cloudflare · Code · Deployment settings. They only ever interact with Payload's admin UI.</div>
+      </div>
+    </div>
+    <div class="phase-pills">
+      <span class="pill now">Phase 1: hardcoded (now)</span>
+      <span class="pill">Phase 2: Payload CMS (next)</span>
+      <span class="pill">Phase 3: Lovable off</span>
+    </div>
+  </div>
+
+  <div class="detail" id="d-media">
+    <span class="detail-close" onclick="toggle('d-media')">close</span>
+    <h3>Media team workflow</h3>
+    <div class="detail-grid">
+      <div class="detail-item">
+        <div class="detail-item-title">Phase 1 — now (manual)</div>
+        <div class="detail-item-body">Download approved assets from Canto. Upload manually to Cloudflare R2 bucket. Developer updates .asset.json references in the production branch.</div>
+      </div>
+      <div class="detail-item">
+        <div class="detail-item-title">Phase 2 — semi-automated</div>
+        <div class="detail-item-body">Payload CMS handles editorial images (event photos, news images). Media team uploads directly in Payload — files go straight to R2 via the S3 adapter.</div>
+      </div>
+      <div class="detail-item">
+        <div class="detail-item-title">Phase 3 — Canto automated</div>
+        <div class="detail-item-body">Canto webhook fires on asset approval. A Cloudflare Worker intercepts it, pulls the asset, writes it to R2 under /brand/. The asset URL is available instantly. Zero manual steps.</div>
+      </div>
+      <div class="detail-item">
+        <div class="detail-item-title">Canto's role (all phases)</div>
+        <div class="detail-item-body">Source of truth for brand assets. Approval workflows, tagging, versioning, rights management. Never serves end users directly — R2 does the delivery.</div>
+      </div>
+    </div>
+    <div class="phase-pills">
+      <span class="pill now">Phase 1: manual download → R2 (now)</span>
+      <span class="pill">Phase 2: Payload handles editorial</span>
+      <span class="pill">Phase 3: Canto webhook → R2</span>
+    </div>
+  </div>
+
+  <div class="detail" id="d-dev">
+    <span class="detail-close" onclick="toggle('d-dev')">close</span>
+    <h3>Developer responsibilities</h3>
+    <div class="detail-grid">
+      <div class="detail-item">
+        <div class="detail-item-title">Now (active)</div>
+        <div class="detail-item-body">Set up R2 bucket · update .asset.json files · configure Cloudflare Pages production branch · add Supabase env vars · install Payload on Coolify</div>
+      </div>
+      <div class="detail-item">
+        <div class="detail-item-title">Ongoing</div>
+        <div class="detail-item-body">UI/layout changes via Lovable or direct code · migrate hardcoded content to Payload collections · build Canto→R2 webhook automation</div>
+      </div>
+      <div class="detail-item">
+        <div class="detail-item-title">Toolchain</div>
+        <div class="detail-item-body">Lovable (UI prototyping) · GitHub production branch · Cloudflare dashboard · Coolify on Azure VM</div>
+      </div>
+      <div class="detail-item">
+        <div class="detail-item-title">Long-term goal</div>
+        <div class="detail-item-body">Developer is not in the critical path for content. Only UI changes, new features, and infrastructure work require developer involvement.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div style="display:flex;justify-content:center;gap:40px;margin:-8px 0">
+  <div class="arrow"><div class="arrow-line"></div><div class="arrow-head"></div></div>
+  <div class="arrow"><div class="arrow-line"></div><div class="arrow-head"></div></div>
+  <div class="arrow"><div class="arrow-line"></div><div class="arrow-head"></div></div>
+</div>
+
+<div class="zone">
+  <div class="zone-label">authoring tools</div>
+  <div class="row">
+    <div class="node" onclick="toggle('d-payload')">
+      <div class="node-title">Payload CMS</div>
+      <div class="node-sub">cms.pestalozzi.org · Coolify/Azure</div>
+      <div class="node-badge">phase 2+</div>
+    </div>
+    <div class="node" onclick="toggle('d-canto')">
+      <div class="node-title">Canto DAM</div>
+      <div class="node-sub">brand media source of truth</div>
+      <div class="node-badge">manual now · webhook later</div>
+    </div>
+    <div class="node" onclick="toggle('d-lovable')">
+      <div class="node-title">Lovable</div>
+      <div class="node-sub">UI dev · pushes to GitHub</div>
+      <div class="node-badge">phase out over time</div>
+    </div>
+  </div>
+
+  <div class="detail" id="d-payload">
+    <span class="detail-close" onclick="toggle('d-payload')">close</span>
+    <h3>Payload CMS</h3>
+    <div class="detail-grid">
+      <div class="detail-item">
+        <div class="detail-item-title">What it is</div>
+        <div class="detail-item-body">Headless CMS built on Node.js. Self-hosted on Coolify alongside Supabase. Uses the same Postgres database — its own schema sits alongside the app's schema.</div>
+      </div>
+      <div class="detail-item">
+        <div class="detail-item-title">Database connection</div>
+        <div class="detail-item-body">Connects to Supabase Postgres via DATABASE_URI env var. Payload manages its own migrations — no conflict with app tables as long as schemas are separate.</div>
+      </div>
+      <div class="detail-item">
+        <div class="detail-item-title">Media storage</div>
+        <div class="detail-item-body">S3 storage adapter configured to point at Cloudflare R2. Editorial images uploaded in Payload land at r2/editorial/. URL returned immediately for use in content.</div>
+      </div>
+      <div class="detail-item">
+        <div class="detail-item-title">How the app reads it</div>
+        <div class="detail-item-body">REST or GraphQL API at cms.pestalozzi.org/api. App fetches content at build time (SSG) or runtime (SSR). Migrated page by page — hardcoded content first, then live fetch.</div>
+      </div>
+    </div>
+    <div class="conn-grid">
+      <div class="conn-item"><b>env vars needed</b>DATABASE_URI · PAYLOAD_SECRET · S3_BUCKET · S3_ENDPOINT · S3_KEY · S3_SECRET</div>
+      <div class="conn-item"><b>deploy</b>Docker container on Coolify · subdomain cms.pestalozzi.org · port 3000</div>
+      <div class="conn-item"><b>collections to build</b>News · Alumni stories · Events · Team · Programmes · Jobs</div>
+    </div>
+  </div>
+
+  <div class="detail" id="d-canto">
+    <span class="detail-close" onclick="toggle('d-canto')">close</span>
+    <h3>Canto DAM integration</h3>
+    <div class="detail-grid">
+      <div class="detail-item">
+        <div class="detail-item-title">Current state</div>
+        <div class="detail-item-body">No direct URL access from Canto. Media team downloads assets manually, developer uploads to R2. Canto is used only as internal storage — not connected to the website yet.</div>
+      </div>
+      <div class="detail-item">
+        <div class="detail-item-title">Future: webhook automation</div>
+        <div class="detail-item-body">Canto fires a webhook when an asset is approved/published. A Cloudflare Worker receives it, downloads the asset from Canto's API, writes it to R2 under /brand/, logs metadata to Supabase.</div>
+      </div>
+      <div class="detail-item">
+        <div class="detail-item-title">R2 folder structure</div>
+        <div class="detail-item-body">/brand/ — synced from Canto (approved brand assets)<br>/editorial/ — uploaded via Payload (news, events)<br>/video/ — large videos, manually uploaded</div>
+      </div>
+      <div class="detail-item">
+        <div class="detail-item-title">What Canto never does</div>
+        <div class="detail-item-body">Serves assets to end users. That's R2's job. Canto is editorial workflow only — approvals, tagging, rights, versioning.</div>
+      </div>
+    </div>
+    <div class="phase-pills">
+      <span class="pill now">Now: manual download → R2</span>
+      <span class="pill">Later: Canto webhook → Worker → R2</span>
+    </div>
+  </div>
+
+  <div class="detail" id="d-lovable">
+    <span class="detail-close" onclick="toggle('d-lovable')">close</span>
+    <h3>Lovable — current role and exit plan</h3>
+    <div class="detail-grid">
+      <div class="detail-item">
+        <div class="detail-item-title">Current role</div>
+        <div class="detail-item-body">AI-assisted UI development. Generates React/TanStack Start components. Pushes to GitHub main branch. All content currently hardcoded in route files.</div>
+      </div>
+      <div class="detail-item">
+        <div class="detail-item-title">The problem</div>
+        <div class="detail-item-body">Lovable's asset CDN (/__l5e/) is proprietary — assets don't travel with the repo. Any media uploaded through Lovable is inaccessible outside their platform.</div>
+      </div>
+      <div class="detail-item">
+        <div class="detail-item-title">Transition plan</div>
+        <div class="detail-item-body">Move asset references from .asset.json Lovable URLs to R2 URLs. Migrate content to Payload. Once content is in Payload and assets in R2, Lovable is only used for UI changes.</div>
+      </div>
+      <div class="detail-item">
+        <div class="detail-item-title">When it can be turned off</div>
+        <div class="detail-item-body">When all content is in Payload, all assets in R2, and the team is comfortable editing code directly or using another tool for UI changes.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div style="display:flex;justify-content:center;gap:40px;margin:-8px 0">
+  <div class="arrow arrow-dashed"><div class="arrow-line"></div><div class="arrow-head"></div><div class="arrow-label">→ R2</div></div>
+  <div class="arrow arrow-dashed"><div class="arrow-line"></div><div class="arrow-head"></div><div class="arrow-label">manual now</div></div>
+  <div class="arrow"><div class="arrow-line"></div><div class="arrow-head"></div><div class="arrow-label">→ GitHub</div></div>
+</div>
+
+<div class="zone">
+  <div class="zone-label">storage layer</div>
+  <div class="row">
+    <div class="node" onclick="toggle('d-r2')" style="flex:2">
+      <div class="node-title">Cloudflare R2</div>
+      <div class="node-sub">assets.pestalozzi.org · S3-compatible · zero egress</div>
+      <div class="node-badge">/brand/ · /editorial/ · /video/</div>
+    </div>
+    <div class="node" onclick="toggle('d-github')" style="flex:1">
+      <div class="node-title">GitHub</div>
+      <div class="node-sub">production branch · auto-deploy trigger</div>
+    </div>
+  </div>
+
+  <div class="detail" id="d-r2">
+    <span class="detail-close" onclick="toggle('d-r2')">close</span>
+    <h3>Cloudflare R2 — asset storage</h3>
+    <div class="detail-grid">
+      <div class="detail-item">
+        <div class="detail-item-title">Setup</div>
+        <div class="detail-item-body">Create bucket pestalozzi-assets in Cloudflare dashboard. Enable public access. Set custom domain assets.pestalozzi.org via CNAME. Takes ~20 minutes.</div>
+      </div>
+      <div class="detail-item">
+        <div class="detail-item-title">S3 compatibility</div>
+        <div class="detail-item-body">R2 implements the S3 API. Endpoint: https://&lt;account-id&gt;.r2.cloudflarestorage.com. Same SDKs, same tooling as AWS S3 — just a different endpoint and credentials.</div>
+      </div>
+      <div class="detail-item">
+        <div class="detail-item-title">Why not AWS S3</div>
+        <div class="detail-item-body">R2 has zero egress fees. S3 charges ~$0.09/GB egress. For a site serving videos globally, egress adds up fast. R2 free tier covers 10GB storage — plenty to start.</div>
+      </div>
+      <div class="detail-item">
+        <div class="detail-item-title">Connecting Payload</div>
+        <div class="detail-item-body">In Payload config, use @payloadcms/storage-s3. Set endpoint to R2 URL, region to auto, force-path-style to true. All media uploaded in Payload lands in R2 automatically.</div>
+      </div>
+      <div class="detail-item">
+        <div class="detail-item-title">Connecting self-hosted Supabase</div>
+        <div class="detail-item-body">In Supabase Storage env vars: STORAGE_BACKEND=s3, GLOBAL_S3_ENDPOINT=R2 URL, GLOBAL_S3_REGION=auto, GLOBAL_S3_FORCE_PATH_STYLE=true + R2 access keys.</div>
+      </div>
+      <div class="detail-item">
+        <div class="detail-item-title">Immediate fix needed</div>
+        <div class="detail-item-body">Download 5 missing videos + ~60 scraped images from Lovable CDN. Upload to R2. Update .asset.json files in production branch to point at R2 URLs. Site will be fully functional.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="detail" id="d-github">
+    <span class="detail-close" onclick="toggle('d-github')">close</span>
+    <h3>GitHub — deployment pipeline</h3>
+    <div class="detail-grid">
+      <div class="detail-item">
+        <div class="detail-item-title">Branch strategy</div>
+        <div class="detail-item-body">main — Lovable pushes here for development. production — the live branch, Cloudflare Pages deploys from this. Assets are added to production directly.</div>
+      </div>
+      <div class="detail-item">
+        <div class="detail-item-title">Auto-deploy trigger</div>
+        <div class="detail-item-body">Every push to production triggers a new Cloudflare Pages build. Build command: npm run build. Output directory: dist. Node version: 22 (TanStack Start requirement).</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div style="display:flex;justify-content:center;gap:40px;margin:-8px 0">
+  <div class="arrow"><div class="arrow-line"></div><div class="arrow-head"></div></div>
+  <div class="arrow"><div class="arrow-line"></div><div class="arrow-head"></div></div>
+</div>
+
+<div class="zone">
+  <div class="zone-label">data layer — Coolify / Azure VM</div>
+  <div class="row">
+    <div class="node" onclick="toggle('d-postgres')">
+      <div class="node-title">Supabase Postgres</div>
+      <div class="node-sub">app schema + payload schema</div>
+    </div>
+    <div class="node" onclick="toggle('d-auth')">
+      <div class="node-title">Supabase Auth</div>
+      <div class="node-sub">user auth · row-level security</div>
+    </div>
+    <div class="node" onclick="toggle('d-coolify')">
+      <div class="node-title">Coolify / Azure VM</div>
+      <div class="node-sub">hosts Supabase + Payload</div>
+    </div>
+  </div>
+
+  <div class="detail" id="d-postgres">
+    <span class="detail-close" onclick="toggle('d-postgres')">close</span>
+    <h3>Supabase Postgres — shared database</h3>
+    <div class="detail-grid">
+      <div class="detail-item">
+        <div class="detail-item-title">Schema separation</div>
+        <div class="detail-item-body">public schema → app tables (alumni, donations, newsletter signups, etc). payload schema → Payload CMS tables (articles, team, events, media). Same Postgres instance, no conflict.</div>
+      </div>
+      <div class="detail-item">
+        <div class="detail-item-title">App connection</div>
+        <div class="detail-item-body">App uses Supabase JS client via VITE_SUPABASE_URL + VITE_SUPABASE_ANON_KEY env vars in Cloudflare Pages. Set these in Pages → Settings → Environment variables.</div>
+      </div>
+      <div class="detail-item">
+        <div class="detail-item-title">Payload connection</div>
+        <div class="detail-item-body">Payload connects via DATABASE_URI = postgresql://user:pass@localhost:5432/postgres?schema=payload. Payload runs its own migrations on first start.</div>
+      </div>
+      <div class="detail-item">
+        <div class="detail-item-title">Self-hosted vs cloud</div>
+        <div class="detail-item-body">Self-hosted on Coolify gives you full control, no Supabase Cloud egress costs, and lets you configure Supabase Storage to use R2 as the S3 backend — not possible on Supabase Cloud.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="detail" id="d-auth">
+    <span class="detail-close" onclick="toggle('d-auth')">close</span>
+    <h3>Supabase Auth</h3>
+    <div class="detail-grid">
+      <div class="detail-item">
+        <div class="detail-item-title">What it handles</div>
+        <div class="detail-item-body">User login/signup for any authenticated features on the site (alumni hub, donor portal, etc.). JWT tokens. Row-level security policies on Postgres tables.</div>
+      </div>
+      <div class="detail-item">
+        <div class="detail-item-title">Payload auth is separate</div>
+        <div class="detail-item-body">Payload CMS has its own auth system for admin users (editors logging into the CMS). This is independent of Supabase Auth — different user tables, different JWTs.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="detail" id="d-coolify">
+    <span class="detail-close" onclick="toggle('d-coolify')">close</span>
+    <h3>Coolify on Azure VM</h3>
+    <div class="detail-grid">
+      <div class="detail-item">
+        <div class="detail-item-title">What Coolify is</div>
+        <div class="detail-item-body">Open-source self-hosting platform. Manages Docker deployments, SSL certs, reverse proxy, env vars. Like a self-hosted Heroku/Railway on your own VM.</div>
+      </div>
+      <div class="detail-item">
+        <div class="detail-item-title">Services deployed on it</div>
+        <div class="detail-item-body">Supabase (docker compose — includes Postgres, Auth, Storage, Realtime) · Payload CMS (Docker container) · Any future backend services</div>
+      </div>
+      <div class="detail-item">
+        <div class="detail-item-title">Azure VM sizing</div>
+        <div class="detail-item-body">Start with a B2s (2 vCPU, 4GB RAM) — sufficient for Supabase + Payload at low traffic. Scale up if needed. Supabase docker compose recommends 4GB RAM minimum.</div>
+      </div>
+      <div class="detail-item">
+        <div class="detail-item-title">Subdomains</div>
+        <div class="detail-item-body">cms.pestalozzi.org → Payload CMS · db.pestalozzi.org (optional, internal) → Supabase Studio · Coolify handles SSL via Let's Encrypt automatically.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div style="display:flex;justify-content:center;margin:-8px 0">
+  <div class="arrow"><div class="arrow-line"></div><div class="arrow-head"></div></div>
+</div>
+
+<div class="zone">
+  <div class="zone-label">delivery layer</div>
+  <div class="row">
+    <div class="node" onclick="toggle('d-pages')" style="flex:2">
+      <div class="node-title">Cloudflare Pages</div>
+      <div class="node-sub">globalreach.pestalozzi.org · SSR via Nitro · Cloudflare Workers</div>
+    </div>
+    <div class="node" onclick="toggle('d-worker')" style="flex:1">
+      <div class="node-title">Cloudflare Worker</div>
+      <div class="node-sub">Canto→R2 sync (future)</div>
+      <div class="node-badge">not built yet</div>
+    </div>
+  </div>
+
+  <div class="detail" id="d-pages">
+    <span class="detail-close" onclick="toggle('d-pages')">close</span>
+    <h3>Cloudflare Pages — hosting</h3>
+    <div class="detail-grid">
+      <div class="detail-item">
+        <div class="detail-item-title">Build config</div>
+        <div class="detail-item-body">Framework: none · Build command: npm run build · Output: dist · Node version: 22 (required by TanStack Start). Set NODE_VERSION=22 env var.</div>
+      </div>
+      <div class="detail-item">
+        <div class="detail-item-title">SSR via Nitro</div>
+        <div class="detail-item-body">@lovable.dev/vite-tanstack-config with nitro:true outputs a _worker.js bundle. Cloudflare runs this as a Worker — full SSR, not just static files. Server functions work.</div>
+      </div>
+      <div class="detail-item">
+        <div class="detail-item-title">Required env vars</div>
+        <div class="detail-item-body">VITE_SUPABASE_URL · VITE_SUPABASE_ANON_KEY · (future) VITE_PAYLOAD_URL. Set in Pages → Settings → Environment variables for both Production and Preview.</div>
+      </div>
+      <div class="detail-item">
+        <div class="detail-item-title">Branch strategy</div>
+        <div class="detail-item-body">Production branch: production. Preview branches: any other branch (including main) gets a preview URL. This lets you test Lovable changes before merging to production.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="detail" id="d-worker">
+    <span class="detail-close" onclick="toggle('d-worker')">close</span>
+    <h3>Cloudflare Worker — Canto sync (future)</h3>
+    <div class="detail-grid">
+      <div class="detail-item">
+        <div class="detail-item-title">What it does</div>
+        <div class="detail-item-body">Receives a webhook POST from Canto when an asset is approved. Authenticates the request. Downloads the asset binary from Canto's API. Writes it to R2 under /brand/. Logs metadata to Supabase.</div>
+      </div>
+      <div class="detail-item">
+        <div class="detail-item-title">Why a Worker</div>
+        <div class="detail-item-body">Workers run at Cloudflare's edge, have native R2 bindings (no S3 credentials needed in code), and are free up to 100k requests/day. Perfect for an infrequent asset sync trigger.</div>
+      </div>
+      <div class="detail-item">
+        <div class="detail-item-title">When to build this</div>
+        <div class="detail-item-body">Only when Canto supports webhooks and the media team is actively using Canto as the approval workflow. Not needed for the current manual phase.</div>
+      </div>
+      <div class="detail-item">
+        <div class="detail-item-title">Alternative: scheduled sync</div>
+        <div class="detail-item-body">Instead of webhooks, a Worker cron job runs every hour, queries Canto API for assets approved since last run, downloads and writes new ones to R2. Simpler if Canto doesn't support webhooks.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div style="display:flex;justify-content:center;margin:-8px 0">
+  <div class="arrow"><div class="arrow-line"></div><div class="arrow-head"></div></div>
+</div>
+
+<div class="zone" style="border-style:solid">
+  <div class="zone-label">end users</div>
+  <div class="row">
+    <div class="node" onclick="toggle('d-visitors')">
+      <div class="node-title">Website visitor</div>
+      <div class="node-sub">donors · alumni · partners · general public</div>
+    </div>
+  </div>
+  <div class="detail" id="d-visitors">
+    <span class="detail-close" onclick="toggle('d-visitors')">close</span>
+    <h3>What visitors experience</h3>
+    <div class="detail-grid">
+      <div class="detail-item">
+        <div class="detail-item-title">Page load</div>
+        <div class="detail-item-body">HTML rendered server-side by Nitro on Cloudflare's edge. Static assets (CSS, JS) served from Cloudflare CDN. Images/videos served from R2 via assets.pestalozzi.org.</div>
+      </div>
+      <div class="detail-item">
+        <div class="detail-item-title">Dynamic content (phase 2)</div>
+        <div class="detail-item-body">News articles, alumni stories, events fetched from Payload API at request time. Content changes in Payload appear on the site immediately — no rebuild needed.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div style="margin-top:16px;padding:12px 16px;border:1px dashed var(--color-border-tertiary);border-radius:8px;font-size:11px;color:var(--color-text-tertiary)">
+  <span style="font-weight:500;color:var(--color-text-secondary)">connection summary</span>
+  <div class="conn-grid" style="margin-top:8px">
+    <div class="conn-item"><b>Payload → Postgres</b>DATABASE_URI env var pointing at Supabase Postgres</div>
+    <div class="conn-item"><b>Payload → R2</b>@payloadcms/storage-s3 with R2 endpoint + credentials</div>
+    <div class="conn-item"><b>Supabase Storage → R2</b>STORAGE_BACKEND=s3 + R2 credentials in Supabase env</div>
+    <div class="conn-item"><b>App → Supabase</b>VITE_SUPABASE_URL + VITE_SUPABASE_ANON_KEY in Cloudflare Pages</div>
+    <div class="conn-item"><b>App → Payload</b>VITE_PAYLOAD_URL in Cloudflare Pages (phase 2)</div>
+    <div class="conn-item"><b>GitHub → Pages</b>auto-deploy on push to production branch</div>
+    <div class="conn-item"><b>Canto → R2</b>webhook → Cloudflare Worker (phase 3)</div>
+    <div class="conn-item"><b>Lovable → GitHub</b>Lovable sync pushes to main branch</div>
+    <div class="conn-item"><b>R2 → visitors</b>public bucket at assets.pestalozzi.org</div>
+  </div>
+</div>
+
+</div>
+
+<script>
+function toggle(id) {
+  const el = document.getElementById(id);
+  const isOpen = el.classList.contains('open');
+  document.querySelectorAll('.detail.open').forEach(d => d.classList.remove('open'));
+  if (!isOpen) el.classList.add('open');
+}
+</script>
